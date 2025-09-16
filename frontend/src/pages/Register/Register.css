@@ -1,0 +1,31 @@
+.register { display: grid; place-items: center; min-height: 60vh; }
+.register-title { margin-bottom: .75rem; }
+
+.register-form {
+  width: min(540px, 100%);
+  display: grid; gap: .75rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.register-form label { display: grid; gap: .35rem; }
+.register-form input {
+  background: rgba(255,255,255,.12);
+  color: var(--text);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: .6rem .7rem;
+}
+
+.register-error { color: #ffd6d6; }
+
+.register-form button {
+  justify-self: start;
+  padding: .6rem .9rem; border-radius: 10px;
+  background: linear-gradient(135deg, rgba(142,197,255,0.28), rgba(179,136,255,0.28));
+  border: 1px solid var(--glass-border); color: var(--text);
+}
+
+.register-alt { margin-top: .5rem; opacity: .85; }

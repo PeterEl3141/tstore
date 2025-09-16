@@ -1,0 +1,41 @@
+.tshirt-page {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+  
+  @media (min-width: 900px) {
+    .tshirt-page {
+      grid-template-columns: 1.05fr 0.95fr; /* image | details */
+      align-items: start;
+    }
+  }
+  
+  .tshirt-header {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+  }
+  
+  .tshirt-title {
+    margin: 0;
+    font-size: clamp(1.25rem, 3vw, 1.8rem);
+    font-weight: 700;
+  }
+  
+  .tshirt-price { font-weight: 600; opacity: .85; }
+  
+  .tshirt-image {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    box-shadow: 0 16px 40px var(--shadow);
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+  }
+  
+  .tshirt-description { line-height: 1.6; opacity: .92; }
+  
+  .tshirt-reviews { margin-top: 1rem; }
+  .tshirt-reviews-title { margin: 0 0 .5rem 0; }
+  .tshirt-loading, .tshirt-notfound { color: var(--muted); }
+  

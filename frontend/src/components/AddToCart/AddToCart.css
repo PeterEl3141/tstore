@@ -1,0 +1,31 @@
+.addtocart {
+    margin: .75rem 0 1rem;
+    display: grid; gap: .65rem;
+    padding: .9rem;
+    border-radius: 14px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+  }
+  
+  .addtocart-field { display: grid; gap: .35rem; }
+  .addtocart-field > span { font-size: .85rem; opacity: .8; }
+  
+  .addtocart select, .addtocart input[type="number"] {
+    background: rgba(255,255,255,.12);
+    color: var(--text);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: .5rem .6rem;
+  }
+  
+  .addtocart-button {
+    justify-self: start;
+    padding: .55rem .9rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(142,197,255,0.28), rgba(179,136,255,0.28));
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .addtocart-button:hover { border-color: rgba(255,255,255,.35); }
+  

@@ -1,0 +1,49 @@
+:root{
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-border: rgba(255,255,255,0.20);
+  --glass-nav: rgba(0, 0, 0, 0.8);
+  --text: #000000;
+  --nav-txt: rgb(208, 208, 208);
+  --muted: #3b3b3b;
+  --accent: #e18eff;
+  --accent-2: #b388ff;
+  --shadow: rgba(0,0,0,0.35);
+  --gutter: clamp(8px, 3vw, 24px);
+}
+
+/* Full-page industrial backdrop with a soft dark overlay for contrast */
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+  background:
+    linear-gradient(rgba(251, 251, 251, 0.55), rgba(251, 251, 251, 0.55)),
+    url("/images/background.jpg") center / cover fixed no-repeat;
+}
+
+/* app layout */
+.app { 
+  min-height: 100svh; 
+  display: flex; 
+  flex-direction: column; 
+}
+.app-main { 
+  max-width: 1400px; 
+  width: 100%; 
+  flex: 1;
+  margin: 0 auto; 
+  padding-inline: var(--gutter); 
+}
+
+  .site-footer {
+    margin-top: auto;
+  }
+  
+a { 
+  color: var(--accent); 
+  text-decoration: none; 
+}
+a:hover { 
+  text-decoration: underline; 
+}

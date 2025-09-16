@@ -1,0 +1,17 @@
+/* src/styles/fonts.css */
+@font-face {
+    font-family: "Motterdam";
+    src:
+      url("/fonts/Motterdam-MVanr.otf") format("opentype"),
+      url("/fonts/Motterdam-K74zp.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  /* If you later add a bold variant, add another @font-face with font-weight:700 */
+  
+  :root {
+    --font-brand: "Motterdam", ui-serif, Georgia, "Times New Roman", serif;
+  }
+  

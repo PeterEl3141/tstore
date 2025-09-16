@@ -1,0 +1,108 @@
+:root {
+  --overrun: 24px;          /* how far lines extend past each edge */
+  --stroke: 2px;            /* line thickness */
+  --line: #000;             /* line color */
+}
+
+/* Card base (keep your existing styles, but allow overspill) */
+.tshirt-card {
+  position: relative;
+  overflow: visible;        /* IMPORTANT: let lines extend outside the card */
+  background: var(--glass-bg);
+  color: black;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); /* optional subtle hairline */
+  transition: transform .2s ease, box-shadow .2s ease;
+  z-index: 1;
+  text-decoration: none;     /* remove link underline on the whole card */
+  color: inherit;
+}
+
+/* Lift and stack above neighbors so overrun isn't hidden */
+.tshirt-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.35),
+    0 6px 18px rgba(0,0,0,.10);
+  z-index: 3;
+  text-decoration: none;
+}
+
+/* HORIZONTAL rules (top & bottom) that overrun left/right */
+.tshirt-card::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  /* make the pseudo-element wider than the card */
+  left: calc(-1 * var(--overrun));
+  right: calc(-1 * var(--overrun));
+  top: 0;
+  bottom: 0;                /* spans full height so borders sit exactly on edges */
+  border-top: var(--stroke) solid var(--line);
+  border-bottom: var(--stroke) solid var(--line);
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+
+/* VERTICAL rules (left & right) that overrun top/bottom */
+.tshirt-card::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  top: calc(-1 * var(--overrun));
+  bottom: calc(-1 * var(--overrun));
+  left: 0;
+  right: 0;                 /* spans full width so borders sit exactly on edges */
+  border-left: var(--stroke) solid var(--line);
+  border-right: var(--stroke) solid var(--line);
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+
+/* Show the overrunning lines on hover/focus (a11y) */
+.tshirt-card:hover::before,
+.tshirt-card:hover::after,
+.tshirt-card:focus-within::before,
+.tshirt-card:focus-within::after {
+  opacity: 1;
+}
+
+/* Keep your existing content styles */
+.tshirt-card-image { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
+
+.tshirt-card-body {
+  padding: 0.9rem 1rem 1.1rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.tshirt-card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.tshirt-card-price {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* CTA styled as a button */
+.tshirt-card-cta {
+  justify-self: start;
+  margin-top: 0.35rem;
+  display: inline-block;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(142,197,255,0.18), rgba(179,136,255,0.18));
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  transition: background .2s ease, border-color .2s ease, transform .05s ease;
+  text-decoration: none;
+}
+.tshirt-card-cta:hover {
+  background: linear-gradient(135deg, rgba(135,191,251,0.546), rgba(117,65,207,0.806));
+  border-color: rgba(255,255,255,0.32);
+  text-decoration: none;
+}
+.tshirt-card-cta:active { transform: translateY(1px); }

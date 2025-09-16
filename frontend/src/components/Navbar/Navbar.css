@@ -1,0 +1,109 @@
+.navbar {
+  position: sticky; top: 0; z-index: 50;
+  /* glass sheet */
+  background: var(--glass-nav);
+  border-bottom: 1px solid black;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.navbar-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+}
+
+.navbar-logo {
+  font-weight: 700; letter-spacing: 0.3px; font-size: 1.1rem;
+  color: var(--nav-txt);
+}
+
+.navbar-links {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+
+/* make links look neat + clickable even if they're buttons */
+.navbar-link {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--nav-txt);
+  padding: 0.4rem 0.7rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease, transform .05s ease;
+}
+
+.navbar-link:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: var(--glass-border);
+  text-decoration: none;
+}
+
+.navbar-link:active { transform: translateY(1px); }
+
+/* ===== dropdown for "Hi, {name}" ===== */
+.navbar-user { position: relative; }
+.navbar-user-btn { display: inline-flex; align-items: center; gap: .35rem; }
+
+.navbar-caret { width: 12px; height: 12px; transition: transform .2s ease; }
+.navbar-user-btn[aria-expanded="true"] .navbar-caret { transform: rotate(180deg); }
+
+.navbar-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--glass-nav);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 24px var(--shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.navbar-menu-item {
+  display: block;
+  width: 100%;
+  padding: .5rem .75rem;
+  border-radius: 8px;
+  background: transparent;
+  border: 0;
+  color: var(--nav-txt);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.navbar-menu-item:hover {
+  background: rgba(255,255,255,0.06);
+  text-decoration: none;
+}
+
+.navbar-menu-sep {
+  height: 1px;
+  background: var(--glass-border);
+  margin: 4px 0;
+}
+.navbar-link { display: inline-flex; align-items: center; gap: .35rem; }
+.nav-icon { width: 20px; height: 20px; display: block; }
+.nav-icon, .nav-icon * { fill: currentColor; stroke: currentColor; }
+
+/* optional little badge for cart count */
+.nav-badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid var(--glass-border);
+  color: var(--nav-txt);
+}
+
+.nav-link--home { color: #fff; } 

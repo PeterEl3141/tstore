@@ -1,0 +1,193 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Category {
+  ARTIST
+  PIECE
+}
+
+enum ProductStatus {
+  DRAFT
+  LIVE
+  RETIRED
+}
+
+model TShirt {
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  description  String
+  priceCents   Int
+  currency     String        @default("GBP")
+  images       String[]
+  colorOptions String[]
+  sizeOptions  String[]
+  category     Category
+  status       ProductStatus @default(DRAFT)
+
+  // RELATIONS
+  currentSpecId String?
+  // name this relation to disambiguate from SpecsByShirt
+  currentSpec   PrintSpec?  @relation("CurrentSpec", fields: [currentSpecId], references: [id])
+  specs         PrintSpec[] @relation("SpecsByShirt")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reviews   Review[]
+
+  @@unique([currentSpecId]) // <- optional but recommended (1–1)
+  @@index([category])
+  @@index([name])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  tshirtId   String
+  rating     Int
+  title      String
+  body       String
+  authorName String?
+  createdAt  DateTime @default(now())
+
+  tshirt TShirt @relation(fields: [tshirtId], references: [id], onDelete: Cascade)
+
+  @@index([tshirtId])
+  @@index([rating])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+}
+
+model PrintSpec {
+  id          String  @id @default(cuid())
+  tshirtId    String
+  version     Int
+  isPublished Boolean @default(false)
+
+  // artwork
+  frontFileUrl String?
+  backFileUrl  String?
+  dpi          Int?
+
+  colors   String[]
+  variants PrintVariant[]
+
+  // RELATIONS
+  tshirt TShirt @relation("SpecsByShirt", fields: [tshirtId], references: [id])
+
+  // 👇 add the back-relation for CurrentSpec (no fields/references here)
+  currentOf TShirt? @relation("CurrentSpec")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tshirtId, version])
+}
+
+model PrintVariant {
+  id         String @id @default(cuid())
+  specId     String
+  size       String
+  color      String
+  productUid String
+
+  spec PrintSpec @relation(fields: [specId], references: [id])
+
+  @@unique([specId, size, color])
+}
+
+enum OrderStatus {
+  DRAFT
+  PAID
+  SUBMITTED
+  FULFILLED
+  CANCELED
+}
+
+model Order {
+  id               String   @id @default(cuid())
+  status           OrderStatus @default(DRAFT)
+  currency         String
+  email            String
+  subtotalCents    Int
+  shippingCents    Int @default(0)
+  taxCents         Int @default(0)
+  totalCents       Int
+
+  // Stripe link
+  paymentIntentId  String?  @unique
+
+  // Optional: capture what we printed
+  specId           String?  // points to PrintSpec used (if single-item store)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  confirmationSentAt DateTime?
+
+
+  shippingName     String?
+  shippingLine1    String?
+  shippingLine2    String?
+  shippingCity     String?
+  shippingState    String?
+  shippingPostCode String?
+  shippingCountry  String?
+  shippingPhone    String?
+
+  items            OrderItem[]
+
+  gelatoOrderId   String?  @unique
+  submittedAt     DateTime?
+  gelatoStatus       String?   // raw Gelato status text
+  trackingUrl        String?
+  trackingNumber     String?
+  carrier            String?
+  shippedAt          DateTime?
+  lastFulfillCheckAt DateTime?
+  lastFulfillError   String?
+
+  // optional: deliveredAt DateTime?
+}
+
+model OrderItem {
+  id               String  @id @default(cuid())
+  orderId          String
+  productId        String
+  productName      String
+  productSlug      String
+  size             String
+  color            String
+  qty              Int
+  unitPriceCents   Int
+  lineTotalCents   Int
+
+  // lock what was printed
+  specId           String?
+  variantProductUid String?
+
+  order            Order   @relation(fields: [orderId], references: [id])
+  @@index([orderId])
+}
+

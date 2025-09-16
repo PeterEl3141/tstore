@@ -1,0 +1,120 @@
+.admin-editor { display: grid; gap: 1rem; }
+
+.admin-editor-title { margin: 0; font-weight: 700; }
+
+.admin-editor-layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 980px) {
+  .admin-editor-layout {
+    grid-template-columns: 320px 1fr; /* list | form */
+  }
+}
+
+.admin-editor-list {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: .75rem;
+}
+
+.admin-editor-list-header {
+  display: flex; justify-content: space-between; gap: .5rem; margin-bottom: .5rem;
+}
+.admin-editor-list-header button {
+  padding: .45rem .7rem; border-radius: 10px;
+  background: rgba(255,255,255,.10);
+  color: var(--text); border: 1px solid var(--glass-border);
+  cursor: pointer;
+}
+
+.admin-editor-items {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: .4rem;
+}
+
+.admin-editor-item {
+  display: grid; grid-template-columns: 1fr auto; gap: .4rem;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: .45rem .5rem;
+}
+
+.admin-editor-item.is-selected {
+  border-color: rgba(255,255,255,.35);
+  background: rgba(255,255,255,.08);
+}
+
+.admin-editor-item-main {
+  text-align: left;
+  background: transparent;
+  color: var(--text);
+  border: none; padding: 0; cursor: pointer;
+}
+.admin-editor-item-name { font-weight: 600; }
+.admin-editor-item-sub { font-size: .85rem; opacity: .8; }
+
+.admin-editor-item-delete {
+  background: transparent; color: #ff9aa2;
+  border: 1px solid rgba(255,154,162,.35);
+  padding: .25rem .45rem; border-radius: 8px; cursor: pointer;
+}
+
+.admin-editor-formwrap {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.admin-editor-form { display: grid; gap: .8rem; }
+
+.admin-editor-form-row {
+  display: grid; gap: .75rem;
+}
+@media (min-width: 700px) {
+  .admin-editor-form-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .admin-editor-form-row .admin-editor-col { grid-column: span 1; }
+}
+
+.admin-editor-col { display: grid; gap: .4rem; }
+
+.admin-editor-form input,
+.admin-editor-form textarea,
+.admin-editor-form select {
+  background: rgba(255,255,255,.12);
+  color: var(--text);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: .55rem .7rem;
+}
+
+.admin-editor-actions {
+  display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
+}
+.admin-editor-actions button {
+  padding: .6rem .9rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(142,197,255,0.28), rgba(179,136,255,0.28));
+  border: 1px solid var(--glass-border);
+  color: var(--text);
+  cursor: pointer;
+}
+.admin-editor-hint { opacity: .8; }
+.admin-editor-error {
+  border: 1px solid rgba(255,110,110,.35);
+  background: rgba(255,110,110,.1);
+  color: #ffd6d6;
+  padding: .6rem .75rem; border-radius: 10px;
+}
+
+
+@media (min-width: 700px) {
+    .span-2 { grid-column: span 2; }
+  }

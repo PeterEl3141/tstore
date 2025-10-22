@@ -1,4 +1,3 @@
-// src/routes/admin.uploads.js
 import express from "express";
 import multer from "multer";
 import crypto from "crypto";
@@ -7,27 +6,36 @@ import { protect, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
+// Multer: keep JSON body parsers BEFORE this route is fine; multer handles multipart
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
 const s3 = new S3Client({
-  region: process.env.AWS_REGION, // e.g., "eu-west-2"
+  region: process.env.AWS_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
 
-// allow common image types
+// optional allowlist
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/svg+xml"]);
 
-router.post("/", protect, requireAdmin, upload.array("files", 5), async (req, res, next) => {
+router.post("/", protect, requireAdmin, upload.array("files", 5), async (req, res) => {
   try {
+    // ✅ early checks to avoid silent success with no URLs
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        message:
+          "No files received. Make sure the field name is 'files' and you're sending multipart/form-data.",
+      });
+    }
+
     const out = [];
 
-    for (const file of req.files || []) {
+    for (const file of req.files) {
       if (!ALLOWED.has(file.mimetype)) {
         return res.status(400).json({ message: `Unsupported type: ${file.mimetype}` });
       }
@@ -35,24 +43,31 @@ router.post("/", protect, requireAdmin, upload.array("files", 5), async (req, re
       const ext = (file.originalname.split(".").pop() || "bin").toLowerCase();
       const key = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
 
-      await s3.send(new PutObjectCommand({
-        Bucket: process.env.S3_BUCKET,            // e.g., "tstore-uploads"
+      // If your bucket blocks ACLs, remove the ACL line entirely.
+      const putParams = {
+        Bucket: process.env.S3_BUCKET,
         Key: key,
         Body: file.buffer,
         ContentType: file.mimetype,
-        // DO NOT set ACL when bucket blocks ACLs; public read is via bucket policy
-        // ACL: "public-read",
-        CacheControl: "public, max-age=31536000, immutable", // optional, nice for CDN/browser caching
-      }));
+      };
+      // Uncomment ONLY if your bucket allows ACLs and you want public read via ACL.
+      // putParams.ACL = "public-read";
 
-      // e.g., https://tstore-uploads.s3.eu-west-2.amazonaws.com/<key>
-      out.push(`${process.env.S3_PUBLIC_BASE}/${key}`);
+      await s3.send(new PutObjectCommand(putParams));
+
+      // Public URL
+      const base = process.env.S3_PUBLIC_BASE?.replace(/\/+$/, "");
+      out.push(`${base}/${key}`);
     }
 
     res.status(201).json({ urls: out });
   } catch (e) {
-    console.error("S3 upload error:", e?.name, e?.message, e?.$metadata || e);
-    next(e);
+    console.error("Upload error:", e?.name, e?.message || e);
+    const msg =
+      e?.name === "AccessControlListNotSupported"
+        ? "Bucket blocks ACLs; remove ACL:'public-read' from PutObjectCommand."
+        : e?.message || "Upload failed";
+    res.status(500).json({ message: msg });
   }
 });
 

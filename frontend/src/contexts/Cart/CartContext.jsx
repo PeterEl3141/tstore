@@ -65,7 +65,7 @@ export function CartProvider({ children }) {
   const totals = useMemo(() => {
     const count = state.items.reduce((n, i) => n + i.qty, 0);
     const subtotalCents = state.items.reduce((n, i) => n + i.priceCents * i.qty, 0);
-    const currency = state.items[0]?.currency ?? "USD";
+    const currency = state.items[0]?.currency ?? "GBP";
     return { count, subtotalCents, currency };
   }, [state.items]);
 

@@ -1,31 +1,65 @@
+/* Container */
 .addtocart {
-    margin: .75rem 0 1rem;
-    display: grid; gap: .65rem;
-    padding: .9rem;
-    border-radius: 14px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+  display: grid;
+  gap: 12px;
+  padding: 0;                 /* no card padding */
+  background: transparent;    /* remove glass card */
+  border: 0;                  /* no card border */
+}
+
+/* Desktop: Size + CTA side-by-side */
+@media (min-width: 720px) {
+  .addtocart.addtocart--inline {
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+    column-gap: 12px;
   }
-  
-  .addtocart-field { display: grid; gap: .35rem; }
-  .addtocart-field > span { font-size: .85rem; opacity: .8; }
-  
-  .addtocart select, .addtocart input[type="number"] {
-    background: rgba(255,255,255,.12);
-    color: var(--text);
-    border: 1px solid var(--glass-border);
-    border-radius: 10px;
-    padding: .5rem .6rem;
-  }
-  
-  .addtocart-button {
-    justify-self: start;
-    padding: .55rem .9rem;
-    border-radius: 10px;
-    background: linear-gradient(135deg, rgba(142,197,255,0.28), rgba(179,136,255,0.28));
-    border: 1px solid var(--glass-border);
-    color: var(--text);
-    cursor: pointer;
-  }
-  .addtocart-button:hover { border-color: rgba(255,255,255,.35); }
-  
+  .addtocart-color { grid-column: 1 / -1; }  /* color (if present) full width above */
+  .addtocart-size  { grid-column: 1; }
+  .addtocart-button{ grid-column: 2; }
+}
+
+/* Mobile: stack everything, full-width CTA */
+@media (max-width: 719px) {
+  .addtocart { grid-template-columns: 1fr; }
+  .addtocart-button { width: 100%; }
+}
+
+/* Labels */
+.addtocart label { display: grid; gap: 8px; }
+.addtocart label > span {
+  font-size: .95rem;
+  font-weight: 600;
+}
+
+/* Controls: square, big, high-contrast */
+.addtocart select {
+  height: 56px;
+  padding: 0 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111;
+  background: #fff;
+  border: 1px solid #111;
+  border-radius: 0;                   /* square corners */
+  appearance: none;                   /* cleaner select */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Primary CTA: big, bold, black/white, square */
+.addtocart-button {
+  height: 56px;
+  padding: 0 24px;
+  border: 1px solid #000;
+  border-radius: 0;                   /* square corners */
+  background: #000;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  cursor: pointer;
+}
+
+.addtocart-button:hover    { filter: brightness(1.05); }
+.addtocart-button:disabled { opacity: .6; cursor: not-allowed; }

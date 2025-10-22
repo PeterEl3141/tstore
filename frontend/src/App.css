@@ -5,8 +5,8 @@
   --text: #000000;
   --nav-txt: rgb(208, 208, 208);
   --muted: #3b3b3b;
-  --accent: #e18eff;
-  --accent-2: #b388ff;
+  --accent: #090909;
+  --accent-2: #5c00fa;
   --shadow: rgba(0,0,0,0.35);
   --gutter: clamp(8px, 3vw, 24px);
 }

@@ -3,6 +3,9 @@ import { z } from "zod";
 import Stripe from "stripe";
 import { prisma } from "../lib/prisma.js";
 import { asyncHandler } from "../middleware/asyncHandler.js";
+import { Router } from "express";
+import { protect } from "../middleware/auth.js";
+
 
 const stripe = new Stripe(process.env.STRIPE_SECRET);
 const router = express.Router();
@@ -135,6 +138,36 @@ router.post("/checkout", asyncHandler(async (req, res) => {
     await prisma.order.update({ where: { id: order.id }, data: { paymentIntentId: pi.id } });
     res.json({ clientSecret: pi.client_secret, orderId: order.id });
   }));
+
+
+
+
+  router.get("/mine", protect, async (req, res, next) => {
+    try {
+      const email = req.user.email;
+      const orders = await prisma.order.findMany({
+        where: { email },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          status: true,
+          gelatoStatus: true,
+          createdAt: true,
+          totalCents: true,
+          currency: true,
+          trackingUrl: true,
+          trackingNumber: true,
+          carrier: true,
+          items: {
+            select: {
+              id: true, name: true, color: true, size: true, qty: true, priceCents: true
+            }
+          }
+        }
+      });
+      res.json({ items: orders });
+    } catch (e) { next(e); }
+  });
   
 
 export default router;

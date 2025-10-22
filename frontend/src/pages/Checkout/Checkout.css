@@ -1,0 +1,91 @@
+/* Page shell */
+.checkout {
+    max-width: 900px;
+    margin: 72px auto 80px;
+    padding: 0 clamp(16px, 4vw, 32px);
+    display: grid;
+    gap: 24px;
+  }
+  
+  .checkout-title {
+    margin: 0;
+    font-size: clamp(1.6rem, 2.6vw, 2rem);
+    font-weight: 700;
+  }
+  
+  /* Form card */
+  .checkout-form {
+    display: grid;
+    gap: 16px;
+    max-width: 560px;
+    padding: 20px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    border-radius: 12px;
+  }
+  
+  /* Two-up rows (City/State, Postcode/Country) */
+  .field-row {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .field-row { grid-template-columns: 1fr 1fr; }
+  }
+  
+  /* Label + control */
+  .checkout-form label {
+    display: grid;
+    gap: 8px;
+  }
+  .checkout-form label > span {
+    font-size: .95rem;
+    font-weight: 600;
+  }
+  
+  /* Inputs: big, square, high-contrast like your add-to-cart */
+  .checkout-form input {
+    height: 56px;
+    padding: 0 14px;
+    font-size: 1rem;
+    color: #111;
+    background: #fff;
+    border: 1px solid #111;
+    border-radius: 0;              /* square corners */
+    outline: none;
+  }
+  .checkout-form input::placeholder { color: rgba(0,0,0,.45); }
+  .checkout-form input:focus {
+    box-shadow: 0 0 0 2px rgba(0,0,0,.12);
+  }
+  
+  /* Error */
+  .form-error {
+    padding: 10px 12px;
+    border: 1px solid #e33;
+    background: #ffecec;
+    color: #900;
+    border-radius: 6px;
+    font-size: .95rem;
+  }
+  
+  /* Primary CTA: big, black/white, square corners */
+  .btn-primary {
+    height: 56px;
+    width: 100%;
+    border: 1px solid #000;
+    border-radius: 0;
+    background: #000;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    cursor: pointer;
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.05); }
+  .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+  
+  /* Stripe step (optional container if you want spacing consistency)
+     .payment-step { max-width: 560px; } */
+  

@@ -3,7 +3,9 @@ import { useCart } from "../../contexts/Cart/CartContext.jsx";
 import { useAuth } from "../../contexts/Auth/AuthContext.jsx";
 import { useState, useRef, useEffect } from "react";
 import "./Navbar.css";
-import HomeIcon from "../../images/home.svg?react"
+import HomeIcon from "../../assets/icons/home.svg?react";
+import CartIcon from "../../assets/icons/cart.svg?react";
+import CurrencySelector from "../CurrencySelector/CurrencySelector.jsx";
 
 export default function Navbar() {
   const { totals } = useCart();
@@ -46,8 +48,9 @@ export default function Navbar() {
           <Link to="/about" className="navbar-link">
             About
           </Link>
+          <CurrencySelector/>
           <Link to="/cart" className="navbar-link">
-          <img className="nav-icon" src="/images/cart.png" alt="" />
+          <CartIcon className="nav-icon"/>
           {totals.count ? <span className="nav-badge">{totals.count}</span> : null}
           </Link>
 

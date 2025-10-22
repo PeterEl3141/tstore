@@ -11,6 +11,8 @@ import {
 import "./AdminEditor.css";
 import UploadImages from "../../components/UploadImages/UploadImages.jsx";
 import SpecsPanel from "./SpecsPanel.jsx";
+import ColorSwatches from "../../components/ColorSwatches/ColorSwatches.jsx";
+
 
 const EMPTY = {
   name: "",
@@ -246,7 +248,7 @@ export default function AdminEditor() {
 
             <div className="admin-editor-form-row">
               <label>
-                Price (USD)
+                Price (GBP)
                 <input
                   type="number"
                   min="0"
@@ -319,6 +321,15 @@ export default function AdminEditor() {
                 />
                 <small>Shown to customers</small>
               </label>
+
+              <label className="admin-editor-col">
+              Colors (click to toggle)
+              <ColorSwatches
+                value={form.colorOptionsText}
+                onChange={(v)=>updateField("colorOptionsText", v)}
+              />
+              <small>{form.colorOptionsText || "Pick one or more"}</small>
+            </label>
 
               {/* Sizes */}
               <label className="admin-editor-col">

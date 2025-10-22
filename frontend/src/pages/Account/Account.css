@@ -1,0 +1,76 @@
+.account {
+    max-width: 1100px;
+    margin: 72px auto 48px;
+    padding: 0 clamp(16px, 4vw, 32px);
+    display: grid;
+    gap: 16px;
+  }
+  
+  .account-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 12px;
+  }
+  .account-title { margin: 0; font-size: clamp(1.5rem, 2.2vw, 2rem); }
+  .account-sub { color: #6b7280; }
+  
+  .account-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 900px) {
+    .account-grid { grid-template-columns: 1fr; }
+  }
+  
+  .account-card {
+    background: var(--glass-bg, rgba(255,255,255,0.6));
+    border: 1px solid var(--glass-border, rgba(0,0,0,0.08));
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 10px 30px var(--shadow, rgba(0,0,0,0.05));
+  }
+  .card-title { margin: 0 0 8px 0; font-weight: 700; }
+  
+  .kv { display: grid; grid-template-columns: 120px 1fr; padding: 6px 0; }
+  .kv > span:first-child { color: #6b7280; }
+  
+  .account-actions { display: flex; gap: 8px; margin-top: 12px; }
+  
+  .order-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .order-item { border: 1px dashed rgba(0,0,0,0.1); border-radius: 10px; padding: 12px; }
+  
+  .order-top {
+    display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px;
+  }
+  .order-id code { background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 6px; }
+  .order-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .order-date { color: #6b7280; }
+  .order-total { font-weight: 700; }
+  
+  .order-lines { display: grid; gap: 8px; margin-top: 8px; }
+  .order-line { display: grid; grid-template-columns: 1fr auto; gap: 4px; align-items: center; }
+  .line-name { font-weight: 600; }
+  .line-opts { color: #6b7280; font-size: 0.95rem; }
+  .line-price { font-weight: 600; }
+  
+  .order-actions { margin-top: 8px; }
+  
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 999px;
+    font-size: 12px; line-height: 18px; border: 1px solid transparent;
+  }
+  .badge-default { background: #eef2ff; color: #3730a3; border-color: #c7d2fe; }
+  .badge-info    { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+  .badge-success { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+  .badge-danger  { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+  
+  .btn { border: 1px solid #d1d5db; background: white; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+  .btn:hover { background: #f9fafb; }
+  .btn-ghost { background: transparent; }
+  .btn-sm { padding: 4px 8px; font-size: 0.92rem; }
+  
+  .muted { color: #6b7280; }
+  .error { color: #b91c1c; }
+  

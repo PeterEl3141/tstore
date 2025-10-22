@@ -12,12 +12,15 @@ import Register from "./pages/Register/Register.jsx";
 import Checkout from "./pages/Checkout/Checkout.jsx";
 import AdminOrders from "./pages/AdminOrders/AdminOrders.jsx";
 import About from "./pages/About/About.jsx";
-
+import CheckoutSuccess from "./pages/CheckoutSuccess/CheckoutSuccess.jsx";
+import Account from "./pages/Account/Account.jsx";
 
 import { CartProvider } from "./contexts/Cart/CartContext.jsx";
 import { AuthProvider } from "./contexts/Auth/AuthContext.jsx";
+import { CurrencyProvider } from "./contexts/Currency/CurrencyContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
+  <CurrencyProvider>
   <AuthProvider>
   <CartProvider>
   <BrowserRouter>
@@ -33,10 +36,13 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="checkout/success" element={<div>Thanks! Payment received.</div>} />
         <Route path="/admin/orders" element={<AdminOrders />} />
         <Route path="/about" element={<About />} />
+        <Route path="/checkout/success" element={<CheckoutSuccess />} />
+        <Route path="/account" element={<Account />} />
 
       </Route>
     </Routes>
   </BrowserRouter>
   </CartProvider>
   </AuthProvider>
+  </CurrencyProvider>
 );

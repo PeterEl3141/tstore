@@ -93,18 +93,23 @@ export default function TShirt() {
   // Order candidates (PNG first, “-1”, “front”)
   const prioritized = useMemo(() => prioritizeImagesMeta(allEntries), [allEntries]);
 
-  // Filter by selected color; fall back to filename heuristic, then to all
+  
+  //Filter by selected color, but always include neutrals:
+  // - entries tagged "any"
+  // - entries with NO tags (plain URL lines)
   const imagesForColor = useMemo(() => {
     if (!prioritized.length) return [];
     if (!color) return prioritized.map(e => e.url);
 
     const wanted = norm(color);
-    const tagged = prioritized.filter(e => e.tags.some(tag => tag === wanted));
-    if (tagged.length) return tagged.map(e => e.url);
+    const base = prioritized.filter(e => e.tags.length === 0 || e.tags.includes("any"));
+    const tagged = prioritized.filter(e => e.tags.includes(wanted));
 
-    // Heuristic fallback when no tags present
+    if (tagged.length) return [...tagged, ...base].map(e => e.url);
+
+    // Heuristic fallback if nothing is tagged for this color
     const hits = prioritized.filter(e => e.url.toLowerCase().includes(wanted));
-    return (hits.length ? hits : prioritized).map(e => e.url);
+    return (hits.length ? [...hits, ...base] : prioritized).map(e => e.url);
   }, [prioritized, color]);
 
   const hero =

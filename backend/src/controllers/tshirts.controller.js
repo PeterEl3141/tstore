@@ -12,7 +12,7 @@ export async function listTShirts(req, res) {
 
   const [items, total] = await Promise.all([
     prisma.tShirt.findMany({
-      where,
+      where: { status: 'LIVE' },
       orderBy: { createdAt: "desc" },
       skip,
       take,

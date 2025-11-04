@@ -6,7 +6,7 @@ export default function CurrencySelector() {
     <select
       value={selected}
       onChange={e => setSelected(e.target.value)}
-      style={{ background: "transparent", border: "1px solid #ddd", borderRadius: 6, padding: "4px 8px", color: "--nav-txt"}}
+      style={{ background: "transparent", border: "1px solid #ddd", borderRadius: 6, padding: "4px 8px", color: "white"}}
       aria-label="Currency"
     >
       {DISPLAY.map(c => <option key={c} value={c}>{c}</option>)}

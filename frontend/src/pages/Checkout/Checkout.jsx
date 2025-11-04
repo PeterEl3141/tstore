@@ -1,11 +1,11 @@
 // frontend/src/pages/Checkout/Checkout.jsx
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { createCheckout } from "../../api/orders";
 import { useCart } from "../../contexts/Cart/CartContext.jsx";
-import { useEffect } from "react";
-import './Checkout.css'
+import "./Checkout.css";
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 function CheckoutForm({ clientSecret }) {
@@ -22,9 +22,7 @@ function CheckoutForm({ clientSecret }) {
 
     const { error } = await stripe.confirmPayment({
       elements,
-      confirmParams: {
-        return_url: window.location.origin + "/checkout/success",
-      },
+      confirmParams: { return_url: window.location.origin + "/checkout/success" },
     });
 
     if (error) setErr(error.message || "Payment failed");
@@ -42,10 +40,38 @@ function CheckoutForm({ clientSecret }) {
 
 export default function Checkout() {
   const { items } = useCart();
+
   const [clientSecret, setClientSecret] = useState(null);
   const [err, setErr] = useState("");
+  const [starting, setStarting] = useState(false);
 
-  // Helper: normalize country to ISO-2 (handles common names)
+  // Customer input
+  const [email, setEmail] = useState("");
+  const [addr, setAddr] = useState({
+    name: "",
+    phone: "",
+    line1: "",
+    line2: "",
+    city: "",
+    state: "",
+    postCode: "",
+    country: "GB", // ISO-2 preferred; user can overwrite
+  });
+
+  // Basic guard to enable the button
+  const canStart = useMemo(() => {
+    return Boolean(
+      items?.length > 0 &&
+      email &&
+      addr.name &&
+      addr.line1 &&
+      addr.city &&
+      addr.postCode &&
+      addr.country
+    );
+  }, [items, email, addr]);
+
+  // Normalize a free-text country to ISO-2 where possible
   function toISO2(country) {
     if (!country) return "GB";
     const up = String(country).trim().toUpperCase();
@@ -60,76 +86,58 @@ export default function Checkout() {
     return MAP[up] || "GB";
   }
 
-  useEffect(() => {
-    let cancelled = false;
+  // This is what was missing
+  async function startCheckout(e) {
+    e.preventDefault();
+    if (!canStart || starting) return;
 
-    async function run() {
-      try {
-        setErr("");
-        setClientSecret(null);
+    setStarting(true);
+    setErr("");
 
-        // Build your payload (keep your current values / form bindings)
-        const payload = {
-          currency: "GBP",
-          email: "buyer@example.com",
-          shippingAddress: {
-            name: "Buyer Name",
-            line1: "123 Main St",
-            line2: "",
-            city: "New York",
-            state: "NY",
-            postCode: "10001",
-            country: "US", // can be "US" or a full name like "United States"
-            phone: "+1 555 123 4567", // optional if you added phone
-          },
-          items: items.map(i => ({
-            productId: i.id,
-            size: i.size,
-            color: i.color,
-            qty: i.qty,
-          })),
-        };
+    try {
+      const API = import.meta.env.VITE_API_URL;
 
-        // --- REGION ELIGIBILITY CHECK (server) ---
-        const API = import.meta.env.VITE_API_URL;
-        const iso2 = toISO2(payload.shippingAddress.country);
-        const res = await fetch(
-          `${API}/api/shipping/eligibility?country=${encodeURIComponent(iso2)}`,
-          { credentials: "include" }
+      // 1) Region eligibility
+      const iso2 = toISO2(addr.country);
+      const eligRes = await fetch(`${API}/api/shipping/eligibility?country=${encodeURIComponent(iso2)}`, {
+        credentials: "include",
+      });
+      const elig = await eligRes.json();
+      if (!eligRes.ok || elig.eligible === false) {
+        const reason = elig?.reason || "unavailable";
+        throw new Error(
+          reason === "sanctioned"
+            ? "Sorry, we currently can’t ship to your country."
+            : "Shipping to your country is unavailable right now."
         );
-        const el = await res.json();
-
-        if (!res.ok || el.eligible === false) {
-          const reason = el?.reason || "unavailable";
-          throw new Error(
-            reason === "sanctioned"
-              ? "Sorry, we currently can’t ship to your country."
-              : "Shipping to your country is unavailable right now."
-          );
-        }
-
-        // Ensure payload uses ISO-2 for the server
-        payload.shippingAddress.country = iso2;
-
-        // --- CREATE CHECKOUT / PAYMENT INTENT ---
-        const data = await createCheckout(payload);
-        if (cancelled) return;
-        setClientSecret(data.clientSecret);
-      } catch (e) {
-        if (cancelled) return;
-        setErr(e?.response?.data?.message || e.message || "Checkout failed");
       }
-    }
 
-    if (items && items.length > 0) run();
-    return () => { cancelled = true; };
-  }, [items]);
-  // ----- return (...) goes below -----
+      // 2) Create PaymentIntent via your server
+      const payload = {
+        currency: "GBP",
+        email,
+        shippingAddress: { ...addr, country: iso2 }, // ensure ISO-2
+        items: items.map((i) => ({
+          productId: i.id,
+          size: i.size,
+          color: i.color,
+          qty: i.qty,
+        })),
+      };
+
+      const data = await createCheckout(payload);
+      setClientSecret(data.clientSecret);
+    } catch (e) {
+      setErr(e?.response?.data?.message || e.message || "Checkout failed");
+    } finally {
+      setStarting(false);
+    }
+  }
 
   return (
     <section className="checkout">
       <h1 className="checkout-title">Checkout</h1>
-  
+
       {!clientSecret && (
         <form onSubmit={startCheckout} className="checkout-form">
           <label>
@@ -142,7 +150,7 @@ export default function Checkout() {
               placeholder="you@example.com"
             />
           </label>
-  
+
           <label>
             <span>Name</span>
             <input
@@ -151,18 +159,18 @@ export default function Checkout() {
               required
             />
           </label>
-  
+
           <label>
             <span>Phone</span>
             <input
               type="tel"
               value={addr.phone}
-              onChange={(e) => setAddr(a => ({ ...a, phone: e.target.value }))}
+              onChange={(e) => setAddr((a) => ({ ...a, phone: e.target.value }))}
               placeholder="+44 7123 456789"
               required
             />
           </label>
-  
+
           <label>
             <span>Address line 1</span>
             <input
@@ -171,7 +179,7 @@ export default function Checkout() {
               required
             />
           </label>
-  
+
           <label>
             <span>Address line 2 (optional)</span>
             <input
@@ -179,7 +187,7 @@ export default function Checkout() {
               onChange={(e) => setAddr((a) => ({ ...a, line2: e.target.value }))}
             />
           </label>
-  
+
           <div className="field-row">
             <label>
               <span>City</span>
@@ -189,7 +197,7 @@ export default function Checkout() {
                 required
               />
             </label>
-  
+
             <label>
               <span>County/State (optional)</span>
               <input
@@ -198,7 +206,7 @@ export default function Checkout() {
               />
             </label>
           </div>
-  
+
           <div className="field-row">
             <label>
               <span>Postcode</span>
@@ -208,28 +216,26 @@ export default function Checkout() {
                 required
               />
             </label>
-  
+
             <label>
-              <span>Country (ISO-2)</span>
+              <span>Country (ISO-2 or name)</span>
               <input
                 value={addr.country}
-                onChange={(e) =>
-                  setAddr((a) => ({ ...a, country: e.target.value.toUpperCase() }))
-                }
+                onChange={(e) => setAddr((a) => ({ ...a, country: e.target.value }))}
                 required
                 placeholder="GB"
               />
             </label>
           </div>
-  
+
           {err && <div className="form-error">{err}</div>}
-  
+
           <button className="btn-primary" type="submit" disabled={!canStart || starting}>
             {starting ? "Preparing payment…" : "Continue to payment"}
           </button>
         </form>
       )}
-  
+
       {clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <CheckoutForm clientSecret={clientSecret} />
@@ -237,5 +243,4 @@ export default function Checkout() {
       )}
     </section>
   );
-  
 }

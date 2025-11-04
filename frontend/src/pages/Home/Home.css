@@ -18,11 +18,17 @@
 /* Simple responsive grid, transparent background, tiny gaps */
 .home-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 0px;               /* keep tiny space between tiles */
-  background: transparent; /* no black background */
-  overflow: visible;  
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+
+  /* NEW: allow a bit of “bleed” without causing page overflow */
+  --card-bleed: 16px;               /* tweak to taste (matches your --overrun vibe) */
+  padding-inline: var(--card-bleed);
+  margin-inline: calc(-1 * var(--card-bleed));
+  overflow-x: hidden;               /* belt & braces: no horizontal scroll */
 }
+
+
 
 /* slightly larger cards on big screens */
 @media (min-width: 1200px) {
@@ -33,3 +39,14 @@
 
 /* Safety: hide any leftover overlay if it exists from HMR */
 .grid-overhang { display: none !important; }
+
+
+
+/*.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 0px;               
+  background: transparent; 
+  overflow: visible;  
+}
+

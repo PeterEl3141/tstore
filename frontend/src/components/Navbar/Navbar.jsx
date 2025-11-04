@@ -32,7 +32,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner">
         <Link to="/" className="navbar-logo">
-        <HomeIcon className="nav-icon" />
+        Con Fuoco
         </Link>
         <div className="navbar-links">
           {isAdmin && (

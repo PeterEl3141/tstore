@@ -1,23 +1,23 @@
 :root {
-  --overrun: 24px;          /* how far lines extend past each edge */
-  --stroke: 2px;            /* line thickness */
-  --line: #000;             /* line color */
+  --overrun: clamp(10px, 1.8vw, 24px); /* responsive */
+  --stroke: 2px;
+  --line: #000;
 }
 
-/* Card base (keep your existing styles, but allow overspill) */
+/* Card base */
 .tshirt-card {
   position: relative;
-  overflow: visible;        /* IMPORTANT: let lines extend outside the card */
+  overflow: hidden;                 /* <-- prevent any overflow-driven scroll */
   background: var(--glass-bg);
   color: black;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); /* optional subtle hairline */
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.12);
   transition: transform .2s ease, box-shadow .2s ease;
   z-index: 1;
-  text-decoration: none;     /* remove link underline on the whole card */
+  text-decoration: none;
   color: inherit;
 }
 
-/* Lift and stack above neighbors so overrun isn't hidden */
+/* Lift on hover (pure transform — no layout shift) */
 .tshirt-card:hover {
   transform: translateY(-2px);
   box-shadow:
@@ -27,47 +27,74 @@
   text-decoration: none;
 }
 
-/* HORIZONTAL rules (top & bottom) that overrun left/right */
-.tshirt-card::before {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  /* make the pseudo-element wider than the card */
-  left: calc(-1 * var(--overrun));
-  right: calc(-1 * var(--overrun));
-  top: 0;
-  bottom: 0;                /* spans full height so borders sit exactly on edges */
-  border-top: var(--stroke) solid var(--line);
-  border-bottom: var(--stroke) solid var(--line);
-  opacity: 0;
-  transition: opacity .15s ease;
-}
-
-/* VERTICAL rules (left & right) that overrun top/bottom */
+/* Single overlay draws the “overrun” lines as backgrounds
+   Oversize the backgrounds beyond the element bounds, but since they’re
+   backgrounds (not boxes), they won’t create horizontal scroll. */
 .tshirt-card::after {
   content: "";
   position: absolute;
+  inset: 0;
   pointer-events: none;
-  top: calc(-1 * var(--overrun));
-  bottom: calc(-1 * var(--overrun));
-  left: 0;
-  right: 0;                 /* spans full width so borders sit exactly on edges */
-  border-left: var(--stroke) solid var(--line);
-  border-right: var(--stroke) solid var(--line);
   opacity: 0;
   transition: opacity .15s ease;
+
+  /* Two linear-gradients: one for top/bottom, one for left/right */
+  background-image:
+    /* horizontal lines (top & bottom) */
+    linear-gradient(var(--line), var(--line)),
+    /* vertical lines (left & right) */
+    linear-gradient(90deg, var(--line), var(--line));
+
+  /* Make them wider/taller than the card to “overrun” visually */
+  background-size:
+    calc(100% + (2 * var(--overrun))) var(--stroke),
+    var(--stroke) calc(100% + (2 * var(--overrun)));
+
+  /* Position top/bottom centered; left/right centered */
+  background-position:
+    center top,                     /* top line */
+    left center;                    /* left line */
+
+  /* Repeat to get both sides: top+bottom and left+right */
+  background-repeat:
+    no-repeat,                      /* top line */
+    no-repeat;                      /* left line */
+
+  /* Trick: add the missing opposite sides using multiple backgrounds */
+  background-image:
+    /* top + bottom */
+    linear-gradient(var(--line), var(--line)),
+    linear-gradient(var(--line), var(--line)),
+    /* left + right */
+    linear-gradient(90deg, var(--line), var(--line)),
+    linear-gradient(90deg, var(--line), var(--line));
+
+  background-size:
+    calc(100% + (2 * var(--overrun))) var(--stroke),   /* top */
+    calc(100% + (2 * var(--overrun))) var(--stroke),   /* bottom */
+    var(--stroke) calc(100% + (2 * var(--overrun))),   /* left */
+    var(--stroke) calc(100% + (2 * var(--overrun)));   /* right */
+
+  background-position:
+    center top,                                        /* top */
+    center bottom,                                     /* bottom */
+    left center,                                       /* left */
+    right center;                                      /* right */
 }
 
-/* Show the overrunning lines on hover/focus (a11y) */
-.tshirt-card:hover::before,
+/* Show lines on hover/focus */
 .tshirt-card:hover::after,
-.tshirt-card:focus-within::before,
 .tshirt-card:focus-within::after {
   opacity: 1;
 }
 
-/* Keep your existing content styles */
-.tshirt-card-image { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
+/* Content styles (unchanged) */
+.tshirt-card-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+}
 
 .tshirt-card-body {
   padding: 0.9rem 1rem 1.1rem;
@@ -87,7 +114,6 @@
   font-size: 0.95rem;
 }
 
-/* CTA styled as a button */
 .tshirt-card-cta {
   justify-self: start;
   margin-top: 0.35rem;

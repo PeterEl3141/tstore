@@ -9,7 +9,7 @@
 }
 
 .navbar-inner {
-  max-width: 1400px; margin: 0 auto;
+  max-width: 1500px; margin: 0 auto;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0.75rem 1.25rem;
 }
@@ -17,6 +17,7 @@
 .navbar-logo {
   font-weight: 700; letter-spacing: 0.3px; font-size: 1.1rem;
   color: var(--nav-txt);
+  font-family: Motterdam;
 }
 
 .navbar-links {

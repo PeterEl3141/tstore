@@ -7,7 +7,6 @@ import { formatMoney } from "../../lib/money";
 import { useCurrency } from "../../contexts/Currency/CurrencyContext.jsx";
 import "./TShirt.css";
 import { prioritizeImages } from "../../lib/images.js";
-import { useMemo } from "react";
 
 
 

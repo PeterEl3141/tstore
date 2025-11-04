@@ -47,3 +47,26 @@ a {
 a:hover { 
   text-decoration: underline; 
 }
+
+
+
+
+/* Keep layout from ever spilling horizontally */
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+html, body, #root {
+  width: 100%;
+  overflow-x: clip; /* use `hidden` if clip isn't supported on an older browser */
+}
+
+/* Media should never exceed its container */
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}

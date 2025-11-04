@@ -9,7 +9,7 @@ const router = express.Router();
 // Multer: keep JSON body parsers BEFORE this route is fine; multer handles multipart
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 50 * 1024 * 1024 }, // 10MB
 });
 
 const s3 = new S3Client({

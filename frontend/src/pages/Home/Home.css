@@ -15,17 +15,20 @@
   margin-top: 80px;
 }
 
-/* Simple responsive grid, transparent background, tiny gaps */
+/* make room for card overrun without widening the page */
 .home-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 1rem;
 
-  /* NEW: allow a bit of “bleed” without causing page overflow */
-  --card-bleed: 16px;               /* tweak to taste (matches your --overrun vibe) */
-  padding-inline: var(--card-bleed);
-  margin-inline: calc(-1 * var(--card-bleed));
-  overflow-x: hidden;               /* belt & braces: no horizontal scroll */
+  /* match the card’s --overrun so lines can spill inside this gutter */
+  --overrun: 18px;                 /* tweak to taste */
+  margin-inline: calc(-1 * var(--overrun));
+  padding-inline: var(--overrun);
+
+  /* belt & suspenders to prevent horizontal scroll */
+  overflow-x: clip;                 /* modern browsers */
+  /* overflow-x: hidden;            fallback if needed */
 }
 
 

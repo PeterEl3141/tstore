@@ -72,6 +72,7 @@
     line-height: 1.65;
     max-width: 60ch;
     opacity: .92;
+    white-space: pre-line;
   }
   
   

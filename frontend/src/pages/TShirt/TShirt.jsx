@@ -6,6 +6,10 @@ import AddToCart from "../../components/AddToCart/AddToCart.jsx";
 import { formatMoney } from "../../lib/money";
 import { useCurrency } from "../../contexts/Currency/CurrencyContext.jsx";
 import "./TShirt.css";
+import { prioritizeImages } from "../../lib/images.js";
+import { useMemo } from "react";
+
+
 
 // ---- Color helpers: name -> hex, and which should get a light outline ----
 const COLOR_MAP = {
@@ -19,13 +23,24 @@ const COLOR_MAP = {
 const LIGHT_NAMES = new Set(["White","Cream","Sand","Khaki","Light Grey"]);
 const hexFor = (name) => COLOR_MAP[name] || "#eee";
 
-// ---- Image filter by color (filename contains color name) ----
-function filterImagesByColor(images = [], color = "") {
-  if (!color) return images;
+const sortedAll = useMemo(
+  () => prioritizeImages(t?.images || [], color), 
+  [t, color]
+);
+
+// sort images by PNG first, and then by colour 
+const imagesForColor = useMemo(() => {
+  if (!color) return sortedAll;
   const c = color.toLowerCase();
-  const hits = images.filter(u => u.toLowerCase().includes(c));
-  return hits.length ? hits : images; // fallback if filenames don’t encode the color
-}
+  const hits = sortedAll.filter(u => u.toLowerCase().includes(c));
+  return hits.length ? hits : sortedAll;
+}, [sortedAll, color]);
+
+const hero = imagesForColor[idx]
+  || t?.currentSpec?.frontFileUrl
+  || (t?.images?.[0] ?? null);
+
+
 
 export default function TShirt() {
   const { slug } = useParams();

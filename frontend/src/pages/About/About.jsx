@@ -6,7 +6,7 @@ export default function About() {
       <h1 className="about-title">Our Story</h1>
       <p className="about-text">
         Our sole mission in creating Con Fuco is to rectify the current, 
-        mind-boggling lack of garments inspired by classical music on the marcket.
+        mind-boggling lack of garments inspired by classical music on the market.
         Come on - we're talking about some of the most exciting, vibrant, and original music ever created...
         and what kind of imagery is associated with it? The naffest entourage of half-baked designs, dull colours,
         and sloppy associations that one could imagine. 

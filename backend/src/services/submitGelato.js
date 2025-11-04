@@ -69,7 +69,7 @@ function buildFilesForItem({ frontUrl, backUrl }) {
   const files = [];
   if (frontUrl) files.push({ type: "default",   url: frontUrl }); // "default" = front
   if (backUrl)  files.push({ type: "back",      url: backUrl  });
-  if (brandNeckUrl) files.push({ type: "neck-inner", url: brandNeckUrl });
+  if (brandNeckUrl) files.push({ type: "inner-neck", url: brandNeckUrl });
   return files;
 }
 

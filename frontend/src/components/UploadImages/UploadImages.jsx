@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { api } from "../../api/client";
 
-const MAX_FILES = 5;
-const MAX_MB = 10; // must match server (10MB)
+const MAX_FILES = 20;
+const MAX_MB = 50; // must match server (10MB)
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/svg+xml"]);
 
 export default function UploadImages({ onUploaded }) {

@@ -5,9 +5,8 @@ import ReviewList from "../../components/ReviewList/ReviewList.jsx";
 import AddToCart from "../../components/AddToCart/AddToCart.jsx";
 import { useCurrency } from "../../contexts/Currency/CurrencyContext.jsx";
 import "./TShirt.css";
-import { prioritizeImages } from "../../lib/images.js";
 
-// ---- Color helpers ----
+// ---- Color helpers (name -> hex, outline, etc.) ----
 const COLOR_MAP = {
   Black:"#111827", Charcoal:"#374151", Grey:"#9ca3af", "Light Grey":"#d1d5db",
   White:"#ffffff", Cream:"#f5f0e6", Sand:"#e7d3ad", Khaki:"#c8b68e",
@@ -19,13 +18,42 @@ const COLOR_MAP = {
 const LIGHT_NAMES = new Set(["White","Cream","Sand","Khaki","Light Grey"]);
 const hexFor = (name) => COLOR_MAP[name] || "#eee";
 
-// filename matching: “navy” matches “…-navy-…”, fallback to all
-function filterImagesByColor(images = [], color = "") {
-  if (!images.length) return [];
-  if (!color) return images;
-  const key = color.toLowerCase().replace(/\s+/g, "-");
-  const hits = images.filter(u => u.toLowerCase().includes(key));
-  return hits.length ? hits : images;
+// ---- Color synonyms (editor/customer names -> gelato-ish slugs) ----
+const COLOR_SYNONYMS = new Map([
+  ["charcoal", "dark-heather"],
+  ["dark heather", "dark-heather"],
+  ["vivid orange", "gold"],
+  ["vibrant orange", "gold"],
+  ["burgundy", "cardinal-red"],
+]);
+const norm = (s = "") => {
+  const k = s.trim().toLowerCase();
+  return COLOR_SYNONYMS.get(k) || k;
+};
+
+// ---- Parse "url | Color, Color" lines from t.images into metadata ----
+function parseImageEntry(line = "") {
+  const [rawUrl = "", rawTags = ""] = String(line).split("|");
+  const url = rawUrl.trim();
+  const tags = rawTags
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(norm);
+  return { url, tags };
+}
+
+// ---- Prefer PNG, “-1”, “front” when ordering candidates ----
+function prioritizeImagesMeta(entries = []) {
+  const score = (u) => {
+    const s = u.toLowerCase();
+    let n = 0;
+    if (s.endsWith(".png")) n += 3;          // PNG hero first
+    if (s.includes("-1") || s.includes("_1")) n += 2;
+    if (s.includes("front")) n += 1;
+    return n;
+  };
+  return [...entries].sort((a, b) => score(b.url) - score(a.url));
 }
 
 export default function TShirt() {
@@ -36,6 +64,7 @@ export default function TShirt() {
   // UI state
   const [color, setColor] = useState(null);
   const [idx, setIdx] = useState(0);
+  const [dir, setDir] = useState(1); // 1 = next/right, -1 = prev/left
 
   useEffect(() => {
     let cancelled = false;
@@ -44,7 +73,6 @@ export default function TShirt() {
       .then((d) => {
         if (cancelled) return;
         setT(d);
-        // prefer live spec colors, else product colorOptions
         const firstColor =
           d?.currentSpec?.colors?.[0] ||
           d?.colorOptions?.[0] ||
@@ -56,28 +84,37 @@ export default function TShirt() {
     return () => { cancelled = true; };
   }, [slug]);
 
-  // Sort all images with PNGs first once per product
-  const sortedAll = useMemo(
-    () => prioritizeImages(t?.images || []),
-    [t]
-  );
+  // Convert t.images -> [{url, tags}] once per product
+  const allEntries = useMemo(() => {
+    const raw = Array.isArray(t?.images) ? t.images : [];
+    return raw.map(parseImageEntry).filter(e => !!e.url);
+  }, [t]);
 
-  // Then filter by currently selected color
-  const imagesForColor = useMemo(
-    () => filterImagesByColor(sortedAll, color),
-    [sortedAll, color]
-  );
+  // Order candidates (PNG first, “-1”, “front”)
+  const prioritized = useMemo(() => prioritizeImagesMeta(allEntries), [allEntries]);
+
+  // Filter by selected color; fall back to filename heuristic, then to all
+  const imagesForColor = useMemo(() => {
+    if (!prioritized.length) return [];
+    if (!color) return prioritized.map(e => e.url);
+
+    const wanted = norm(color);
+    const tagged = prioritized.filter(e => e.tags.some(tag => tag === wanted));
+    if (tagged.length) return tagged.map(e => e.url);
+
+    // Heuristic fallback when no tags present
+    const hits = prioritized.filter(e => e.url.toLowerCase().includes(wanted));
+    return (hits.length ? hits : prioritized).map(e => e.url);
+  }, [prioritized, color]);
 
   const hero =
     imagesForColor[idx] ||
     t?.currentSpec?.frontFileUrl ||
-    sortedAll[0] ||
+    allEntries[0]?.url ||
     t?.images?.[0] ||
     null;
 
   const canPurchase = !!t?.currentSpec;
-
-  const [dir, setDir] = useState(1); // 1 = next/right, -1 = prev/left
 
   function next() {
     setDir(1);
@@ -101,7 +138,12 @@ export default function TShirt() {
       {/* Gallery */}
       {hero && (
         <div className="tshirt-gallery" aria-label="Product gallery">
-          <img key={idx} className={`tshirt-image slide ${dir > 0 ? "from-right" : "from-left"}`} src={hero} alt={t.name} />
+          <img
+            key={idx}
+            className={`tshirt-image slide ${dir > 0 ? "from-right" : "from-left"}`}
+            src={hero}
+            alt={t.name}
+          />
           {imagesForColor.length > 1 && (
             <>
               <button className="gal-nav gal-prev" onClick={prev} aria-label="Previous image">‹</button>
@@ -153,7 +195,6 @@ export default function TShirt() {
         )}
 
         {canPurchase ? (
-          // pass the selected color to AddToCart so checkout uses it
           <AddToCart product={t} color={color} />
         ) : (
           <p className="tshirt-notfound">This item isn’t available yet.</p>

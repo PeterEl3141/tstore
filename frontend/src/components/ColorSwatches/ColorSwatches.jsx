@@ -1,6 +1,7 @@
 // frontend/src/components/ColorSwatches/ColorSwatches.jsx
 import "./ColorSwatches.css";
 
+// UI palette (display names)
 const PALETTE = [
   // Neutrals
   { name: "Black", css: "#111827" },
@@ -33,19 +34,45 @@ const PALETTE = [
   { name: "Pink", css: "#ec4899" },
 ];
 
-export default function ColorSwatches({ value = "", onChange }) {
-  const selected = new Set(value.split(",").map(s => s.trim()).filter(Boolean));
+// Display → canonical (Gelato / backend) mapping
+const DISPLAY_TO_CANON = {
+  "Charcoal": "dark-heather",
+  "Vivid Orange": "gold",
+  "Burgundy": "cardinal-red",
+  // identity cases (kept for clarity; optional)
+  "Black": "black",
+  "White": "white",
+  "Navy": "navy",
+  "Red": "red",
+};
 
-  function toggle(name) {
-    const next = new Set(selected);
-    next.has(name) ? next.delete(name) : next.add(name);
-    onChange([...next].join(","));
+function toCanon(label) {
+  if (!label) return "";
+  return DISPLAY_TO_CANON[label] || label.toLowerCase().replace(/\s+/g, "-");
+}
+
+export default function ColorSwatches({ value = "", onChange }) {
+  // Normalize incoming comma list to canonical tokens
+  const selectedCanon = new Set(
+    value
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(toCanon)
+  );
+
+  function toggle(displayName) {
+    const canon = toCanon(displayName);
+    const next = new Set(selectedCanon);
+    next.has(canon) ? next.delete(canon) : next.add(canon);
+    onChange([...next].join(",")); // emit canonical list
   }
 
   return (
     <div className="swatches">
       {PALETTE.map(({ name, css, outline }) => {
-        const active = selected.has(name);
+        const canon = toCanon(name);
+        const active = selectedCanon.has(canon);
         return (
           <button
             type="button"

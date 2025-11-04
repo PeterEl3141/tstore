@@ -77,15 +77,19 @@ export default function TShirt() {
 
   const canPurchase = !!t?.currentSpec;
 
+  const [dir, setDir] = useState(1); // 1 = next/right, -1 = prev/left
+
   function next() {
+    setDir(1);
     setIdx(i => (i + 1) % Math.max(1, imagesForColor.length));
   }
   function prev() {
-    const n = Math.max(1, imagesForColor.length);
-    setIdx(i => (i - 1 + n) % n);
+    setDir(-1);
+    setIdx(i => (i - 1 + Math.max(1, imagesForColor.length)) % Math.max(1, imagesForColor.length));
   }
-  // reset carousel when color changes
-  useEffect(() => { setIdx(0); }, [color]);
+
+  // when color changes, reset index and slide in from right
+  useEffect(() => { setDir(1); setIdx(0); }, [color]);
 
   if (loading) return <p className="tshirt-loading">Loading…</p>;
   if (!t) return <p className="tshirt-notfound">Not found</p>;
@@ -97,7 +101,7 @@ export default function TShirt() {
       {/* Gallery */}
       {hero && (
         <div className="tshirt-gallery" aria-label="Product gallery">
-          <img className="tshirt-image" src={hero} alt={t.name} />
+          <img key={idx} className={`tshirt-image slide ${dir > 0 ? "from-right" : "from-left"}`} src={hero} alt={t.name} />
           {imagesForColor.length > 1 && (
             <>
               <button className="gal-nav gal-prev" onClick={prev} aria-label="Previous image">‹</button>

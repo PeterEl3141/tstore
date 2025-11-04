@@ -18,7 +18,15 @@
       "image info"
       "reviews reviews";
     align-items: start;
+    column-gap: 100px;
   }
+
+  .tshirt-gallery {
+    justify-self: center;   /* stay centered in the left column */
+    width: 80%;
+    max-width: 760px;       /* still keep a sensible cap */
+  }
+
   .tshirt-info { position: sticky; top: 96px; }
 }
 
@@ -43,15 +51,12 @@
 
 .tshirt-image {
   grid-area: image;
-  width: 100%;                 /* avoid 70% on small screens */
-  max-width: 760px;            /* optional cap */
-  justify-self: center;        /* nice centering in its column */
+  width: 100%;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
   background: var(--glass-bg);
   box-shadow: 0 16px 40px var(--shadow);
   object-fit: cover;
-  /* drop aspect-ratio: 1/1 if it crops badly on mobile */
 }
 
   .tshirt-info {
@@ -116,3 +121,31 @@
 .swatch[data-name="Red"] { background:#ef4444; }
 .swatch[data-name="Blue"] { background:#3b82f6; }
 .swatch[data-name="Green"] { background:#10b981; }
+
+
+
+
+
+/* --- slide/fade animation --- */
+.tshirt-image.slide {
+  /* animation will run whenever the <img> key changes */
+  animation: fadeSlide .35s ease both;
+}
+
+/* direction helpers set via a class from React */
+.tshirt-image.from-right { --dx: 24px; }
+.tshirt-image.from-left  { --dx: -24px; }
+
+/* default in case you ever render without a dir class */
+.tshirt-image.slide { --dx: 24px; }
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(var(--dx));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

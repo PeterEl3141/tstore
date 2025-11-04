@@ -4,6 +4,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { createCheckout } from "../../api/orders";
 import { useCart } from "../../contexts/Cart/CartContext.jsx";
+import { useEffect } from "react";
 import './Checkout.css'
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 

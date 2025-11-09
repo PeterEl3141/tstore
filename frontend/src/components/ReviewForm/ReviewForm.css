@@ -94,3 +94,10 @@
     color: #111;
   }
 }
+
+
+.tshirt-reviews {
+  --panel: #fafafa;
+  --border-color: #e5e7eb;
+  --input-bg: #fff;
+}

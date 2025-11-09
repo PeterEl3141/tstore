@@ -224,39 +224,40 @@ export default function TShirt() {
 
       {/* Info / purchase */}
       <div className="tshirt-info">
-        <header className="tshirt-header">
-          <h1 className="tshirt-title">{t.name}</h1>
-          <div className="tshirt-price">{format(t.priceCents)}</div>
-          <div className="tshirt-price-note">(Charged in GBP; other currencies are estimates)</div>
-        </header>
+  <div className="tshirt-info-inner">
+    <header className="tshirt-header">
+      <h1 className="tshirt-title">{t.name}</h1>
+      <div className="tshirt-price">{format(t.priceCents)}</div>
+      <div className="tshirt-price-note">(Charged in GBP; other currencies are estimates)</div>
+    </header>
 
-        <p className="tshirt-description">{t.description}</p>
+    <p className="tshirt-description">{t.description}</p>
 
-        {/* Color swatches (drives AddToCart visually) */}
-        {t.colorOptions?.length > 0 && (
-          <div className="tshirt-colors">
-            <div className="tshirt-colors-label">Color</div>
-            <div className="tshirt-swatches">
-              {t.colorOptions.map((c) => (
-                <button
-                  type="button"
-                  key={c}
-                  className={`swatch ${color === c ? "is-active" : ""} ${LIGHT_NAMES.has(c) ? "is-outline" : ""}`}
-                  onClick={() => setColor(c)}
-                  title={c}
-                  style={{ backgroundColor: hexFor(c) }}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {canPurchase ? (
-          <AddToCart product={t} color={color} />
-        ) : (
-          <p className="tshirt-notfound">This item isn’t available yet.</p>
-        )}
+    {t.colorOptions?.length > 0 && (
+      <div className="tshirt-colors">
+        <div className="tshirt-colors-label">Color</div>
+        <div className="tshirt-swatches">
+          {t.colorOptions.map((c) => (
+            <button
+              type="button"
+              key={c}
+              className={`swatch ${color === c ? "is-active" : ""} ${LIGHT_NAMES.has(c) ? "is-outline" : ""}`}
+              onClick={() => setColor(c)}
+              title={c}
+              style={{ backgroundColor: hexFor(c) }}
+            />
+          ))}
+        </div>
       </div>
+    )}
+
+    {canPurchase ? (
+      <AddToCart product={t} color={color} />
+    ) : (
+      <p className="tshirt-notfound">This item isn’t available yet.</p>
+    )}
+  </div>
+</div>
 
       {/* Reviews */}
       <section className="tshirt-reviews">

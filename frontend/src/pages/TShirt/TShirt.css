@@ -1,3 +1,4 @@
+/* ---------- Layout ---------- */
 .tshirt-page {
   display: grid;
   gap: 20px;
@@ -24,12 +25,17 @@
   .tshirt-gallery {
     justify-self: center;   /* stay centered in the left column */
     width: 80%;
-    max-width: 760px;       /* still keep a sensible cap */
+    max-width: 760px;       /* sensible cap */
   }
 
-  .tshirt-info { position: sticky; top: 96px; }
+  /* Sticky belongs on an inner wrapper (not the grid item) */
+  .tshirt-info-inner {
+    position: sticky;
+    top: 96px;
+  }
 }
 
+/* ---------- Header / Info ---------- */
 .tshirt-header {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -49,8 +55,30 @@
   font-size: 1.125rem;
 }
 
+.tshirt-price-note {
+  font-size: .85rem;
+  color: var(--muted, #6b7280);
+}
+
+/* Grid item for the info column (non-sticky) */
+.tshirt-info {
+  grid-area: info;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.tshirt-description {
+  line-height: 1.65;
+  max-width: 60ch;
+  opacity: .92;
+  white-space: pre-line;
+}
+
+/* ---------- Gallery ---------- */
+.tshirt-gallery { position: relative; grid-area: image; }
+
 .tshirt-image {
-  grid-area: image;
   width: 100%;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
@@ -59,38 +87,7 @@
   object-fit: cover;
 }
 
-  .tshirt-info {
-    grid-area: info;
-    display: grid;
-    gap: 16px;
-    align-content: start;
-    /* Optional: keeps CTA visible while scrolling */
-    top: 96px;
-  }
-  
-  .tshirt-description {
-    line-height: 1.65;
-    max-width: 60ch;
-    opacity: .92;
-    white-space: pre-line;
-  }
-  
-  
-  .tshirt-reviews { 
-    margin-top: 1rem;
-    grid-area: reviews;
-   }
-  .tshirt-reviews-title { margin: 0 0 .5rem 0; }
-  .tshirt-loading, .tshirt-notfound { color: var(--muted); }
-
-
-
-
-
-
-
-  /* Gallery controls */
-.tshirt-gallery { position: relative; grid-area: image; }
+/* Gallery controls */
 .gal-nav {
   position:absolute; top:50%; transform: translateY(-50%);
   border:none; background: rgba(255,255,255,.75);
@@ -104,13 +101,24 @@
 .gal-dot { width:8px; height:8px; border-radius:999px; border:0; background:#d1d5db; }
 .gal-dot.is-active { background:#111827; }
 
-/* Product color swatches */
+/* --- slide/fade animation --- */
+.tshirt-image.slide { animation: fadeSlide .35s ease both; }
+.tshirt-image.from-right { --dx: 24px; }
+.tshirt-image.from-left  { --dx: -24px; }
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateX(var(--dx)); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ---------- Colors / Swatches ---------- */
 .tshirt-colors { display:grid; gap:8px; }
 .tshirt-colors-label { font-size: 12px; color: #6b7280; }
 .tshirt-swatches { display:flex; gap:10px; flex-wrap:wrap; }
 
-/* Neutral “generic” swatches; you can theme by data-name if you want exact hues */
-.swatch { width:26px; height:26px; border-radius:999px; border:1px solid rgba(0,0,0,.15); background:#eee; cursor:pointer; }
+.swatch {
+  width:26px; height:26px; border-radius:999px;
+  border:1px solid rgba(0,0,0,.15); background:#eee; cursor:pointer;
+}
 .swatch.is-active { outline:2px solid #2563eb; outline-offset:2px; }
 
 /* Optional: brand specific colors by name */
@@ -123,30 +131,14 @@
 .swatch[data-name="Blue"] { background:#3b82f6; }
 .swatch[data-name="Green"] { background:#10b981; }
 
-
-
-
-
-/* --- slide/fade animation --- */
-.tshirt-image.slide {
-  /* animation will run whenever the <img> key changes */
-  animation: fadeSlide .35s ease both;
+/* ---------- Reviews (full-width second row) ---------- */
+.tshirt-reviews {
+  grid-area: reviews;
+  grid-column: 1 / -1;   /* explicit span across columns */
+  margin-top: 1rem;
+  position: relative;    /* create stacking context so it won't overlap sticky */
+  z-index: 0;
 }
 
-/* direction helpers set via a class from React */
-.tshirt-image.from-right { --dx: 24px; }
-.tshirt-image.from-left  { --dx: -24px; }
-
-/* default in case you ever render without a dir class */
-.tshirt-image.slide { --dx: 24px; }
-
-@keyframes fadeSlide {
-  from {
-    opacity: 0;
-    transform: translateX(var(--dx));
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
+.tshirt-reviews-title { margin: 0 0 .5rem 0; }
+.tshirt-loading, .tshirt-notfound { color: var(--muted); }

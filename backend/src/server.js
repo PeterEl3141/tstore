@@ -19,6 +19,7 @@ import ordersRouter from "./routes/orders.js";
 import paymentsRouter from "./routes/payments.js";
 import adminOrders from "./routes/admin.orders.js";
 import shippingRoutes from "./routes/shipping.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 import { getGelatoOrder, mapGelatoStatus, extractTracking } from "./services/gelato.js";
@@ -116,6 +117,8 @@ app.use("/api/admin", adminSpecs);
 app.use("/api/orders", ordersRouter);
 app.use("/api/admin/orders", adminOrders);
 app.use("/api/shipping", shippingRoutes);
+app.use("/api/tshirts/:id/reviews", reviewRoutes);
+
 
 // --- 404 + error handlers ---
 app.use(notFound);

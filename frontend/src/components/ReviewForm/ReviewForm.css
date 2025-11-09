@@ -1,0 +1,96 @@
+.reviewform {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  background: var(--panel, #fafafa);
+}
+
+.reviewform h4 {
+  margin: 0 0 2px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.reviewform label {
+  display: grid;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.reviewform input,
+.reviewform textarea,
+.reviewform select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  background: var(--input-bg, #fff);
+  font: inherit;
+  line-height: 1.3;
+}
+
+.reviewform textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.reviewform input:focus,
+.reviewform textarea:focus,
+.reviewform select:focus {
+  outline: none;
+  border-color: var(--focus, #3b82f6);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus, #3b82f6) 20%, transparent);
+}
+
+.reviewform-error {
+  color: #b00020;
+  font-size: 0.92rem;
+}
+
+.reviewform button[type="submit"] {
+  justify-self: start;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-strong, #111);
+  background: var(--btn-bg, #111);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.02s ease, opacity 0.2s ease;
+}
+
+.reviewform button[type="submit"]:hover {
+  opacity: 0.92;
+}
+
+.reviewform button[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+.reviewform button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .reviewform {
+    background: #121212;
+    border-color: #2a2a2a;
+  }
+  .reviewform input,
+  .reviewform textarea,
+  .reviewform select {
+    background: #0c0c0c;
+    border-color: #2a2a2a;
+    color: #eaeaea;
+  }
+  .reviewform button[type="submit"] {
+    border-color: #e5e5e5;
+    background: #e5e5e5;
+    color: #111;
+  }
+}

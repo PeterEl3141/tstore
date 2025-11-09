@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchTShirtBySlug } from "../../api/tshirts";
 import ReviewList from "../../components/ReviewList/ReviewList.jsx";
+import ReviewForm from "../../components/ReviewForm/ReviewForm.jsx";
 import AddToCart from "../../components/AddToCart/AddToCart.jsx";
 import { useCurrency } from "../../contexts/Currency/CurrencyContext.jsx";
 import "./TShirt.css";
@@ -48,13 +49,15 @@ function prioritizeImagesMeta(entries = []) {
   const score = (u) => {
     const s = u.toLowerCase();
     let n = 0;
-    if (s.endsWith(".png")) n += 3;          // PNG hero first
+    if (s.endsWith(".png")) n += 3;
     if (s.includes("-1") || s.includes("_1")) n += 2;
     if (s.includes("front")) n += 1;
     return n;
   };
   return [...entries].sort((a, b) => score(b.url) - score(a.url));
 }
+
+const REV_LIMIT = 10;
 
 export default function TShirt() {
   const { slug } = useParams();
@@ -65,6 +68,13 @@ export default function TShirt() {
   const [color, setColor] = useState(null);
   const [idx, setIdx] = useState(0);
   const [dir, setDir] = useState(1); // 1 = next/right, -1 = prev/left
+
+  // Reviews state
+  const [reviews, setReviews] = useState([]);
+  const [revCount, setRevCount] = useState(0);
+  const [avgRating, setAvgRating] = useState(null);
+  const [revOffset, setRevOffset] = useState(0);
+  const [loadingMoreReviews, setLoadingMoreReviews] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -84,6 +94,26 @@ export default function TShirt() {
     return () => { cancelled = true; };
   }, [slug]);
 
+  // Fetch reviews + summary when we have a product id
+  useEffect(() => {
+    if (!t?.id) return;
+    let cancelled = false;
+
+    (async () => {
+      const [list, summary] = await Promise.all([
+        fetch(`/api/tshirts/${t.id}/reviews?limit=${REV_LIMIT}&offset=0`).then(r => r.json()),
+        fetch(`/api/tshirts/${t.id}/reviews/summary`).then(r => r.json()),
+      ]);
+      if (cancelled) return;
+      setReviews(list.items || []);
+      setRevCount(list.count || 0);
+      setRevOffset(list.items?.length || 0);
+      setAvgRating(summary?.avgRating ?? null);
+    })();
+
+    return () => { cancelled = true; };
+  }, [t?.id]);
+
   // Convert t.images -> [{url, tags}] once per product
   const allEntries = useMemo(() => {
     const raw = Array.isArray(t?.images) ? t.images : [];
@@ -93,10 +123,7 @@ export default function TShirt() {
   // Order candidates (PNG first, “-1”, “front”)
   const prioritized = useMemo(() => prioritizeImagesMeta(allEntries), [allEntries]);
 
-  
-  //Filter by selected color, but always include neutrals:
-  // - entries tagged "any"
-  // - entries with NO tags (plain URL lines)
+  // Filter by selected color, but always include neutrals
   const imagesForColor = useMemo(() => {
     if (!prioritized.length) return [];
     if (!color) return prioritized.map(e => e.url);
@@ -132,6 +159,31 @@ export default function TShirt() {
 
   // when color changes, reset index and slide in from right
   useEffect(() => { setDir(1); setIdx(0); }, [color]);
+
+  // Optimistic add from ReviewForm
+  function handleReviewAdd(newRev) {
+    setReviews((prev) => [newRev, ...prev]);
+    setRevCount((c) => {
+      const nextC = c + 1;
+      setAvgRating((prevAvg) => {
+        if (prevAvg == null || isNaN(prevAvg)) return newRev.rating;
+        return ((prevAvg * c) + newRev.rating) / nextC; // c is previous count
+      });
+      return nextC;
+    });
+  }
+
+  async function loadMoreReviews() {
+    if (!t?.id) return;
+    setLoadingMoreReviews(true);
+    try {
+      const r = await fetch(`/api/tshirts/${t.id}/reviews?limit=${REV_LIMIT}&offset=${revOffset}`).then(r => r.json());
+      setReviews((prev) => [...prev, ...(r.items || [])]);
+      setRevOffset((o) => o + (r.items?.length || 0));
+    } finally {
+      setLoadingMoreReviews(false);
+    }
+  }
 
   if (loading) return <p className="tshirt-loading">Loading…</p>;
   if (!t) return <p className="tshirt-notfound">Not found</p>;
@@ -206,9 +258,24 @@ export default function TShirt() {
         )}
       </div>
 
+      {/* Reviews */}
       <section className="tshirt-reviews">
-        <h2 className="tshirt-reviews-title">Reviews</h2>
-        <ReviewList reviews={t.reviews ?? []} />
+        <div className="tshirt-reviews-header" style={{display:"flex", alignItems:"center", gap:12}}>
+          <h2 className="tshirt-reviews-title">Reviews</h2>
+          {avgRating != null && (
+            <span className="tshirt-reviews-chip">{avgRating.toFixed(1)}★ ({revCount})</span>
+          )}
+        </div>
+
+        <ReviewForm tshirtId={t.id} onAdd={handleReviewAdd} />
+
+        <ReviewList reviews={reviews} />
+
+        {reviews.length < revCount && (
+          <button onClick={loadMoreReviews} disabled={loadingMoreReviews}>
+            {loadingMoreReviews ? "Loading…" : "Load more"}
+          </button>
+        )}
       </section>
     </article>
   );

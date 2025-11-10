@@ -1,0 +1,84 @@
+.checkout-success {
+  max-width: 960px;
+  margin: 56px auto;
+  padding: 0 clamp(16px, 4vw, 24px);
+}
+
+.checkout-success__header {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 12px 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.checkout-success__header h1 {
+  margin: 0 0 4px 0;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+}
+
+.checkout-success__header .icon {
+  width: 48px; height: 48px; border-radius: 999px;
+  display: grid; place-items: center;
+  border: 1px solid #e5e7eb;
+  background: #f0fdf4;
+  font-weight: 700;
+}
+
+.checkout-success__card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(43, 43, 43, 0.354);
+}
+
+.skeleton { opacity: .6; font-style: italic; }
+
+.order-lines { list-style: none; margin: 0; padding: 0; }
+.order-line {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.order-line:last-child { border-bottom: 0; }
+
+.order-line img, .thumb-fallback {
+  width: 64px; height: 64px; border-radius: 8px; object-fit: cover;
+  background: #f1f5f9;
+  border: 1px solid #e5e7eb;
+}
+
+.line-name { font-weight: 600; }
+.line-meta { font-size: .9rem; color: #6b7280; }
+.line-price { font-weight: 600; }
+
+.totals { margin-top: 12px; display: grid; gap: 6px; }
+.totals > div { display: flex; justify-content: space-between; }
+.totals .total { margin-top: 6px; font-weight: 700; }
+
+.address { margin-top: 14px; }
+.address-title { font-size: .9rem; color: #6b7280; margin-bottom: 4px; }
+
+.actions {
+  display: flex; gap: 10px; margin-top: 16px;
+}
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 14px; border-radius: 8px; border: 1px solid #111; background: #111; color: #000000;
+  text-decoration: none; font-weight: 600;
+}
+.btn.secondary { background: #fff; color: #111; }
+
+.muted { color: #6b7280; }
+.error { color: #b00020; margin-top: 12px; }
+
+@media (prefers-color-scheme: dark) {
+  .checkout-success__card { background: #0b0b0b; border-color: #2a2a2a; }
+  .order-line img, .thumb-fallback { background: #111; border-color: #2a2a2a; }
+  .btn.secondary { border-color: #e5e5e5; color: #111; background: #e5e5e5; }
+}

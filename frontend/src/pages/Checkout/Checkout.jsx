@@ -8,6 +8,35 @@ import "./Checkout.css";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
+//take a snapshot to enable realistic checkoutsuccess page even in preview mode
+function saveCheckoutSnapshot({ items, email, address, currency = "GBP", shippingCents = 0, taxCents = 0 }) {
+  const subtotalCents = items.reduce((n, i) => n + i.priceCents * i.qty, 0);
+  const totalCents = subtotalCents + (shippingCents || 0) + (taxCents || 0);
+
+  const snap = {
+    id: "LOCAL-DRAFT-" + Date.now(),
+    createdAt: new Date().toISOString(),
+    email,
+    address: { name: address?.name, city: address?.city, country: address?.country },
+    currency,
+    lineItems: items.map((i) => ({
+      id: `${i.id}|${i.size ?? ""}|${i.color ?? ""}`,
+      name: `${i.name}${i.size ? " — " + i.size : ""}${i.color ? " / " + i.color : ""}`,
+      qty: i.qty,
+      priceCents: i.priceCents,
+      img: i.image || "",
+      color: i.color || "",
+    })),
+    subtotalCents,
+    shippingCents,
+    taxCents,
+    totalCents,
+  };
+  try { localStorage.setItem("checkout:last", JSON.stringify(snap)); } catch {}
+}
+
+
+
 function CheckoutForm({ clientSecret }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -124,6 +153,15 @@ export default function Checkout() {
           qty: i.qty,
         })),
       };
+
+      // Save a local snapshot so the success page can render immediately
+        saveCheckoutSnapshot({
+          items,                 // from useCart()
+          email,
+          address: addr,
+          currency: "GBP",
+          // add shippingCents/taxCents if you have them handy; otherwise omit
+        });
 
       const data = await createCheckout(payload);
       setClientSecret(data.clientSecret);

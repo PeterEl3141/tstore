@@ -268,9 +268,10 @@ export default function TShirt() {
           )}
         </div>
 
+        <ReviewList reviews={reviews} />
         <ReviewForm tshirtId={t.id} onAdd={handleReviewAdd} />
 
-        <ReviewList reviews={reviews} />
+        
 
         {reviews.length < revCount && (
           <button onClick={loadMoreReviews} disabled={loadingMoreReviews}>

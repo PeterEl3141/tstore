@@ -143,31 +143,64 @@ router.post("/checkout", asyncHandler(async (req, res) => {
 
 
   router.get("/mine", protect, async (req, res, next) => {
-    try {
-      const email = req.user.email;
-      const orders = await prisma.order.findMany({
-        where: { email },
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          status: true,
-          gelatoStatus: true,
-          createdAt: true,
-          totalCents: true,
-          currency: true,
-          trackingUrl: true,
-          trackingNumber: true,
-          carrier: true,
-          items: {
-            select: {
-              id: true, name: true, color: true, size: true, qty: true, priceCents: true
-            }
-          }
-        }
-      });
-      res.json({ items: orders });
-    } catch (e) { next(e); }
-  });
-  
+  try {
+    const email = req.user.email;
+
+    const orders = await prisma.order.findMany({
+      where: { email },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        status: true,
+        gelatoStatus: true,
+        createdAt: true,
+        totalCents: true,
+        currency: true,
+        trackingUrl: true,
+        trackingNumber: true,
+        carrier: true,
+        items: {
+          select: {
+            id: true,
+            productName: true,      // <- exists
+            productSlug: true,      // <- exists
+            color: true,
+            size: true,
+            qty: true,
+            unitPriceCents: true,   // <- exists
+            // lineTotalCents: true, // optional if you want it too
+          },
+        },
+      },
+    });
+
+    // Map DB fields -> frontend fields (what Account.jsx expects)
+    const normalized = orders.map(o => ({
+      id: o.id,
+      status: o.status,
+      gelatoStatus: o.gelatoStatus,
+      createdAt: o.createdAt,
+      totalCents: o.totalCents,
+      currency: o.currency,
+      trackingUrl: o.trackingUrl,
+      trackingNumber: o.trackingNumber,
+      carrier: o.carrier,
+      items: o.items.map(it => ({
+        id: it.id,
+        name: it.productName,                 // map
+        slug: it.productSlug ?? null,
+        color: it.color ?? null,
+        size: it.size ?? null,
+        qty: it.qty ?? 1,
+        priceCents: it.unitPriceCents ?? 0,   // map
+      })),
+    }));
+
+    res.json({ items: normalized });
+  } catch (e) {
+    next(e);
+  }
+});
+
 
 export default router;

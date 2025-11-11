@@ -136,7 +136,7 @@ export default function CheckoutSuccess() {
       {error && <div className="error">{error}</div>}
 
       <div className="actions">
-        <Link to="/orders" className="btn secondary">View orders</Link>
+        <Link to="/account" className="btn secondary">View orders</Link>
         <Link to="/" className="btn">Continue shopping</Link>
       </div>
 

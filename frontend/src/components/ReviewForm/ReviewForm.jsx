@@ -1,5 +1,6 @@
 import { useState } from "react";
 import './ReviewForm.css'
+import { api } from "../../api/client";
 
 export default function ReviewForm({ tshirtId, onAdd }) {
   const [form, setForm] = useState({ rating: 5, title: "", body: "", authorName: "" });
@@ -9,32 +10,37 @@ export default function ReviewForm({ tshirtId, onAdd }) {
   const onChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   async function onSubmit(e) {
-    e.preventDefault();
-    setSubmitting(true);
-    setError("");
+  e.preventDefault();
+  if (submitting) return;
 
-    try {
-      const res = await fetch(`/api/tshirts/${tshirtId}/reviews`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          rating: Number(form.rating),
-          title: form.title.trim(),
-          body: form.body.trim(),
-          authorName: form.authorName.trim() || undefined,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to submit review");
+  setSubmitting(true);
+  setError("");
 
-      onAdd?.(data);              // optimistic add
-      setForm({ rating: 5, title: "", body: "", authorName: "" });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
-    }
+  try {
+    const payload = {
+      rating: Number(form.rating),
+      title: form.title.trim(),
+      body: form.body.trim(),
+      authorName: form.authorName.trim() || undefined,
+    };
+
+    const { data } = await api.post(`/tshirts/${tshirtId}/reviews`, payload);
+
+    // optimistic add
+    onAdd?.(data);
+    setForm({ rating: 5, title: "", body: "", authorName: "" });
+  } catch (err) {
+    // Normalize axios/fetch style errors to a friendly message
+    const msg =
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      err?.message ||
+      "Failed to submit review";
+    setError(msg);
+  } finally {
+    setSubmitting(false);
   }
+}
 
   return (
     <form className="reviewform" onSubmit={onSubmit}>

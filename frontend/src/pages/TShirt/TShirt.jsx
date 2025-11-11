@@ -6,6 +6,7 @@ import ReviewForm from "../../components/ReviewForm/ReviewForm.jsx";
 import AddToCart from "../../components/AddToCart/AddToCart.jsx";
 import { useCurrency } from "../../contexts/Currency/CurrencyContext.jsx";
 import "./TShirt.css";
+import { api } from "../../api/client";
 
 // ---- Color helpers (name -> hex, outline, etc.) ----
 const COLOR_MAP = {
@@ -95,24 +96,32 @@ export default function TShirt() {
   }, [slug]);
 
   // Fetch reviews + summary when we have a product id
-  useEffect(() => {
-    if (!t?.id) return;
-    let cancelled = false;
+useEffect(() => {
+  if (!t?.id) return;
+  let cancelled = false;
 
-    (async () => {
-      const [list, summary] = await Promise.all([
-        fetch(`/api/tshirts/${t.id}/reviews?limit=${REV_LIMIT}&offset=0`).then(r => r.json()),
-        fetch(`/api/tshirts/${t.id}/reviews/summary`).then(r => r.json()),
+  (async () => {
+    try {
+      const [listRes, summaryRes] = await Promise.all([
+        api.get(`/tshirts/${t.id}/reviews`, { params: { limit: REV_LIMIT, offset: 0 } }),
+        api.get(`/tshirts/${t.id}/reviews/summary`),
       ]);
       if (cancelled) return;
+
+      const list = listRes.data;
+      const summary = summaryRes.data;
+
       setReviews(list.items || []);
       setRevCount(list.count || 0);
       setRevOffset(list.items?.length || 0);
       setAvgRating(summary?.avgRating ?? null);
-    })();
+    } catch (err) {
+      console.error("Failed to load reviews:", err);
+    }
+  })();
 
-    return () => { cancelled = true; };
-  }, [t?.id]);
+  return () => { cancelled = true; };
+}, [t?.id]);
 
   // Convert t.images -> [{url, tags}] once per product
   const allEntries = useMemo(() => {
@@ -174,16 +183,18 @@ export default function TShirt() {
   }
 
   async function loadMoreReviews() {
-    if (!t?.id) return;
-    setLoadingMoreReviews(true);
-    try {
-      const r = await fetch(`/api/tshirts/${t.id}/reviews?limit=${REV_LIMIT}&offset=${revOffset}`).then(r => r.json());
-      setReviews((prev) => [...prev, ...(r.items || [])]);
-      setRevOffset((o) => o + (r.items?.length || 0));
-    } finally {
-      setLoadingMoreReviews(false);
-    }
+  if (!t?.id) return;
+  setLoadingMoreReviews(true);
+  try {
+    const { data: r } = await api.get(`/tshirts/${t.id}/reviews`, {
+      params: { limit: REV_LIMIT, offset: revOffset },
+    });
+    setReviews((prev) => [...prev, ...(r.items || [])]);
+    setRevOffset((o) => o + (r.items?.length || 0));
+  } finally {
+    setLoadingMoreReviews(false);
   }
+}
 
   if (loading) return <p className="tshirt-loading">Loading…</p>;
   if (!t) return <p className="tshirt-notfound">Not found</p>;

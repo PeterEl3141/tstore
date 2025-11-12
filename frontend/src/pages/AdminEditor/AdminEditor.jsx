@@ -25,6 +25,7 @@ const EMPTY = {
   sizeOptionsText: "S,M,L,XL",
   category: "ARTIST", // or "PIECE"
   status: "DRAFT", // DRAFT | LIVE | RETIRED
+  rank: "1000",
 };
 
 export default function AdminEditor() {
@@ -74,6 +75,7 @@ export default function AdminEditor() {
         sizeOptionsText: (t.sizeOptions ?? []).join(","),
         category: t.category ?? "ARTIST",
         status: t.status ?? "DRAFT",
+        rank: (typeof t.rank === "number" ? t.rank : 1000).toString(),
       });
     } catch (e) {
       setError(e?.response?.data?.message || "Failed to load product");
@@ -104,6 +106,8 @@ export default function AdminEditor() {
       .map((s) => s.trim())
       .filter(Boolean);
     const priceCents = Math.round(Number(f.price || 0) * 100);
+    const rankRaw = Number(f.rank);
+    const rank = Number.isFinite(rankRaw) ? Math.max(1, Math.round(rankRaw)) : 1000;
 
     return {
       name: f.name.trim(),
@@ -116,6 +120,7 @@ export default function AdminEditor() {
       sizeOptions,
       category: f.category.trim() || "ARTIST",
       status: f.status, // optional on backend, but we send it
+      rank,
     };
   }
 
@@ -194,6 +199,7 @@ export default function AdminEditor() {
                       {" "}
                       · {(p.priceCents / 100).toFixed(2)} {p.currency}
                     </span>
+                    <span> · rank {p.rank ?? 1000}</span>
                   </div>
                 </button>
                 <button
@@ -284,6 +290,16 @@ export default function AdminEditor() {
                   <option value="LIVE">LIVE</option>
                   <option value="RETIRED">RETIRED</option>
                 </select>
+              </label>
+              <label title="Lower numbers appear earlier on the homepage">
+                Rank
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={form.rank ?? ""}
+                  onChange={(e) => updateField("rank", e.target.value)}
+                />
               </label>
             </div>
 

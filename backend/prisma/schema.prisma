@@ -46,10 +46,12 @@ model TShirt {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   reviews   Review[]
+  rank         Int      @default(1000)
 
   @@unique([currentSpecId]) // <- optional but recommended (1–1)
   @@index([category])
   @@index([name])
+  @@index([rank, createdAt])
 }
 
 model Review {

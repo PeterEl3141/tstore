@@ -8,17 +8,32 @@ export async function listTShirts(req, res) {
   const take = pageSize;
   const skip = (page - 1) * take;
 
-  const where = q.category ? { category: q.category } : undefined;
+  // If you store categories uppercased, normalize here:
+  const category =
+    q.category && String(q.category).trim()
+      ? String(q.category).trim().toUpperCase()
+      : undefined;
+
+  // Single source of truth for the filter used by BOTH queries
+  const where = {
+    status: "LIVE",
+    ...(category ? { category } : {}),
+  };
 
   const [items, total] = await Promise.all([
     prisma.tShirt.findMany({
-      where: { status: 'LIVE' },
-      orderBy: { createdAt: "desc" },
+      where,
+      orderBy: [{ rank: "asc" }, { createdAt: "desc" }],
       skip,
       take,
       select: {
-        id: true, name: true, slug: true,
-        priceCents: true, currency: true, images: true, category: true,
+        id: true,
+        name: true,
+        slug: true,
+        priceCents: true,
+        currency: true,
+        images: true,
+        category: true,
         createdAt: true,
         _count: { select: { reviews: true } },
       },
@@ -28,6 +43,7 @@ export async function listTShirts(req, res) {
 
   res.json({ items, page, pageSize: take, total });
 }
+
 
 export async function getTShirtById(req, res) {
   const p = res.locals?.validated?.params ?? req.params;

@@ -1,7 +1,16 @@
 import "./ReviewList.css";
 
-export default function ReviewList({ reviews }) {
+export default function ReviewList({ reviews, currentUser, onDelete }) {
   if (!reviews?.length) return <p className="reviewlist-empty">No reviews yet.</p>;
+
+  const canDelete = (r) => {
+    if (!currentUser) return false;
+    const isAdmin = currentUser.role === "ADMIN" || currentUser.isAdmin === true;
+    const isAuthor =
+      r.authorEmail && currentUser.email &&
+      r.authorEmail.toLowerCase() === currentUser.email.toLowerCase();
+    return isAdmin || isAuthor;
+  };
 
   return (
     <ul className="reviewlist">
@@ -11,8 +20,24 @@ export default function ReviewList({ reviews }) {
             <strong className="reviewlist-title">{r.title}</strong>
             <span className="reviewlist-rating">{r.rating}/5</span>
           </div>
+
           <div className="reviewlist-body">{r.body}</div>
-          {r.authorName && <div className="reviewlist-author">by {r.authorName}</div>}
+
+          <div className="reviewlist-footer">
+            {r.authorName && <div className="reviewlist-author">by {r.authorName}</div>}
+
+            {canDelete(r) && (
+              <button
+                type="button"
+                className="reviewlist-delete"
+                onClick={() => onDelete?.(r)}
+                aria-label="Delete review"
+                title="Delete review"
+              >
+                Delete
+              </button>
+            )}
+          </div>
         </li>
       ))}
     </ul>

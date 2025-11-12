@@ -2,6 +2,8 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
+import { protect } from "../middleware/auth.js";
+
 
 const prisma = new PrismaClient(); 
 const router = express.Router({ mergeParams: true });
@@ -47,6 +49,7 @@ router.get("/", async (req, res, next) => {
           body: true,
           authorName: true,
           createdAt: true,
+          authorEmail: true,
         },
       }),
       prisma.review.count({ where: { tshirtId: id } }),
@@ -90,8 +93,12 @@ router.post("/", createLimiter, async (req, res, next) => {
 
     const { rating, title, body, authorName } = parsed.data;
     const review = await prisma.review.create({
-      data: { tshirtId: id, rating, title, body, authorName: authorName ?? null },
-      select: { id: true, rating: true, title: true, body: true, authorName: true, createdAt: true },
+      data: { tshirtId: id, rating, title, body, authorName: authorName ?? null, authorEmail: req.user?.email ?? null,  },
+      select: {
+        id: true, rating: true, title: true, body: true,
+        authorName: true, authorEmail: true, createdAt: true,
+    },
+    
     });
 
     res.status(201).json(review);
@@ -99,5 +106,32 @@ router.post("/", createLimiter, async (req, res, next) => {
     next(err);
   }
 });
+
+
+// DELETE /api/tshirts/:id/reviews/:reviewId
+router.delete("/:reviewId", protect, async (req, res, next) => {
+  try {
+    const { id, reviewId } = req.params;
+
+    const review = await prisma.review.findUnique({ where: { id: reviewId } });
+    if (!review || review.tshirtId !== id) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    // Admins can delete anything; authors can delete their own
+    const isAdmin = req.user?.role === "ADMIN" || req.user?.isAdmin === true;
+    const isAuthor =
+      (review.authorEmail && req.user?.email && review.authorEmail.toLowerCase() === req.user.email.toLowerCase());
+
+    if (!isAdmin && !isAuthor) {
+      return res.status(403).json({ message: "Not allowed to delete this review" });
+    }
+
+    await prisma.review.delete({ where: { id: reviewId } });
+    res.status(204).end();
+  } catch (err) { next(err); }
+});
+
+
 
 export default router;

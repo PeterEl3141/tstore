@@ -6,6 +6,7 @@ import ReviewForm from "../../components/ReviewForm/ReviewForm.jsx";
 import AddToCart from "../../components/AddToCart/AddToCart.jsx";
 import { useCurrency } from "../../contexts/Currency/CurrencyContext.jsx";
 import "./TShirt.css";
+import { useAuth } from "../../contexts/Auth/AuthContext.jsx";
 import { api } from "../../api/client";
 
 // ---- Color helpers (name -> hex, outline, etc.) ----
@@ -64,6 +65,7 @@ export default function TShirt() {
   const { slug } = useParams();
   const [t, setT] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   // UI state
   const [color, setColor] = useState(null);
@@ -196,6 +198,29 @@ useEffect(() => {
   }
 }
 
+// deletion handler
+async function handleReviewDelete(r) {
+  if (!t?.id) return;
+  const ok = window.confirm("Delete this review?");
+  if (!ok) return;
+
+  try {
+    await api.delete(`/tshirts/${t.id}/reviews/${r.id}`);
+    setReviews((prev) => prev.filter((x) => x.id !== r.id));
+    setRevCount((c) => Math.max(0, c - 1));
+    // adjust average optimistically (simple recalculation)
+    setAvgRating((prev) => {
+      if (!reviews.length) return prev;
+      const total = reviews.reduce((n, x) => n + x.rating, 0) - r.rating;
+      const nextCount = reviews.length - 1;
+      return nextCount > 0 ? total / nextCount : null;
+    });
+  } catch (err) {
+    alert(err?.response?.data?.message || err.message || "Failed to delete review");
+  }
+}
+
+
   if (loading) return <p className="tshirt-loading">Loading…</p>;
   if (!t) return <p className="tshirt-notfound">Not found</p>;
 
@@ -279,7 +304,8 @@ useEffect(() => {
           )}
         </div>
 
-        <ReviewList reviews={reviews} />
+        <ReviewList reviews={reviews} currentUser={user}
+          onDelete={handleReviewDelete}/>
         <ReviewForm tshirtId={t.id} onAdd={handleReviewAdd} />
 
         

@@ -53,18 +53,20 @@ model TShirt {
 }
 
 model Review {
-  id         String   @id @default(cuid())
-  tshirtId   String
-  rating     Int
-  title      String
-  body       String
-  authorName String?
-  createdAt  DateTime @default(now())
+  id           String   @id @default(cuid())
+  tshirtId     String
+  rating       Int
+  title        String
+  body         String
+  authorName   String?
+  authorEmail  String?   // new, nullable so it’s a safe online change
+  createdAt    DateTime  @default(now())
 
   tshirt TShirt @relation(fields: [tshirtId], references: [id], onDelete: Cascade)
 
   @@index([tshirtId])
   @@index([rating])
+  @@index([authorEmail])
 }
 
 enum Role {

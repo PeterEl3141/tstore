@@ -49,6 +49,25 @@
   color: var(--muted-foreground, #666);
 }
 
+
+.reviewlist-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.reviewlist-delete {
+  border: 1px solid var(--border-color, #e5e7eb);
+  background: #fff;
+  padding: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.reviewlist-delete:hover { background: #f8f8f8; }
+
+
 /* Dark mode niceties */
 @media (prefers-color-scheme: dark) {
   .reviewlist-item { border-color: #2a2a2a; }

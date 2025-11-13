@@ -37,11 +37,41 @@ export default function Home() {
   const [filter, setFilter] = useState("ALL"); // ALL | ARTIST | PIECE
 
   useEffect(() => {
-    setLoading(true);
-    fetchTShirts({ pageSize: 1000 })
-      .then((data) => setItems(Array.isArray(data.items) ? data.items : []))
-      .finally(() => setLoading(false));
-  }, []);
+  let cancelled = false;
+  const PAGE_SIZE = 50;
+
+  (async () => {
+    try {
+      // 1) Fetch first page to learn `total`
+      const first = await fetchTShirts({ page: 1, pageSize: PAGE_SIZE });
+      if (cancelled) return;
+
+      let all = first.items || [];
+      const pages = Math.ceil((first.total || all.length) / (first.pageSize || PAGE_SIZE));
+
+      // 2) Fetch remaining pages in parallel (if any)
+      if (pages > 1) {
+        const rest = await Promise.all(
+          Array.from({ length: pages - 1 }, (_, i) =>
+            fetchTShirts({ page: i + 2, pageSize: PAGE_SIZE })
+          )
+        );
+        if (cancelled) return;
+        all = all.concat(...rest.map(r => r.items || []));
+      }
+
+      setItems(all);
+    } catch (e) {
+      console.error("Failed to load products:", e);
+      setItems([]);
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  })();
+
+  return () => { cancelled = true; };
+}, []);
+
 
   // Apply filter
   const filtered = useMemo(() => {

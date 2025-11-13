@@ -116,7 +116,7 @@ export default function Home() {
 
         <div className="home-controls">
           <label className="filter">
-            <span>Filter: </span>
+            <span>Filter by:     </span>
             <select value={filter} onChange={(e) => setFilter(e.target.value)}>
               <option value="ALL">All</option>
               <option value="ARTIST">Artists</option>

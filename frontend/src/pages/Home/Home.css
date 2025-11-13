@@ -45,6 +45,23 @@
 .grid-overhang { display: none !important; }
 
 
+.home-controls select{ 
+   height: 40px;
+  padding: 0 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111;
+  background: #fff;
+  border: 1px solid #111;
+  border-radius: 0;                   /* square corners */
+  appearance: none;                   /* cleaner select */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  margin-bottom: 20px;
+  margin-left: 15px;
+}
+
+
 
 /*.home-grid {
   display: grid;

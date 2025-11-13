@@ -39,6 +39,7 @@ const DISPLAY_TO_CANON = {
   "Charcoal": "dark-heather",
   "Vivid Orange": "gold",
   "Burgundy": "cardinal-red",
+  "Pink": "Heliconia",
   // identity cases (kept for clarity; optional)
   "Black": "black",
   "White": "white",

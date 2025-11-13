@@ -38,7 +38,7 @@ export default function Home() {
 
   useEffect(() => {
     setLoading(true);
-    fetchTShirts()
+    fetchTShirts({ pageSize: 1000 })
       .then((data) => setItems(Array.isArray(data.items) ? data.items : []))
       .finally(() => setLoading(false));
   }, []);
@@ -86,7 +86,7 @@ export default function Home() {
 
         <div className="home-controls">
           <label className="filter">
-            <span>Filter:</span>
+            <span>Filter: </span>
             <select value={filter} onChange={(e) => setFilter(e.target.value)}>
               <option value="ALL">All</option>
               <option value="ARTIST">Artists</option>

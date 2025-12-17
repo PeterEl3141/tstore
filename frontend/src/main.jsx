@@ -14,6 +14,7 @@ import AdminOrders from "./pages/AdminOrders/AdminOrders.jsx";
 import About from "./pages/About/About.jsx";
 import CheckoutSuccess from "./pages/CheckoutSuccess/CheckoutSuccess.jsx";
 import Account from "./pages/Account/Account.jsx";
+import Terms from "./pages/Terms/Terms.jsx";
 
 import { CartProvider } from "./contexts/Cart/CartContext.jsx";
 import { AuthProvider } from "./contexts/Auth/AuthContext.jsx";
@@ -34,6 +35,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="register" element={<Register />} />
         <Route path="admin/orders" element={<AdminOrders />} />
         <Route path="/about" element={<About />} />
+        <Route path="/terms" element={<Terms />} />
 
         <Route path="checkout" element={<Checkout />} />
         <Route path="checkout/success" element={<CheckoutSuccess />} />

@@ -1,0 +1,23 @@
+.terms { 
+    max-width: 900px;
+     margin: 0 auto; 
+     padding: 24px;
+      display: grid; 
+      gap: 12px; 
+    }
+.terms-title { 
+    font-family: var(--font-brand); 
+    font-size: 6rem; 
+}
+.terms-heading { 
+    font-family: var(--font-brand); 
+    font-size: 4rem; 
+}
+
+.terms-subheading {
+    font-family: var(--font-brand); 
+    font-size: 3rem; 
+}
+.terms-text { 
+    line-height: 1.6; 
+}

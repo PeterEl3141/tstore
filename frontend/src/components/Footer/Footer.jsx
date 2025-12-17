@@ -13,7 +13,6 @@ export default function Footer() {
           <Link to="/about">About</Link>
           <a href="mailto:support@con-fuoco.co.uk">Contact</a>
           <Link to="/terms">Terms</Link>
-          <Link to="/privacy">Privacy</Link>
         </nav>
         <div className="footer-social">
           <a href="https://instagram.com/yourhandle" aria-label="Instagram" target="_blank" rel="noreferrer">
@@ -24,7 +23,7 @@ export default function Footer() {
             {/* X/Twitter SVG */}
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h4.6l5.7 7.6 6.1-7.6H21l-7.2 9 7.6 9H16.7l-6-8-6.4 8H3l7.5-9z"/></svg>
           </a>
-          <a href="mailto:support@con-fuoco.co.uk" aria-label="Email">
+          <a href="mailto:contact@con-fuoco.co.uk" aria-label="Email">
             {/* Mail SVG */}
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v1l-10 6L2 7V6a2 2 0 0 1 2-2zm18 6.2V18a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7.8l10 6 10-6z"/></svg>
           </a>

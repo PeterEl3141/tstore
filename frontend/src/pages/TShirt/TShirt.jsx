@@ -8,6 +8,8 @@ import { useCurrency } from "../../contexts/Currency/CurrencyContext.jsx";
 import "./TShirt.css";
 import { useAuth } from "../../contexts/Auth/AuthContext.jsx";
 import { api } from "../../api/client";
+import Loader from "../../components/Loader/Loader.jsx";
+
 
 // ---- Color helpers (name -> hex, outline, etc.) ----
 const COLOR_MAP = {
@@ -257,7 +259,7 @@ async function handleReviewDelete(r) {
 }
 
 
-  if (loading) return <p className="tshirt-loading">Loading…</p>;
+  if (loading) return <Loader label="Loading product" />;
   if (!t) return <p className="tshirt-notfound">Not found</p>;
 
   const { format } = useCurrency();
@@ -324,7 +326,7 @@ async function handleReviewDelete(r) {
     )}
 
     {canPurchase ? (
-      <AddToCart product={t} color={color} />
+      <AddToCart product={t} color={color} image={hero} />
     ) : (
       <p className="tshirt-notfound">This item isn’t available yet.</p>
     )}

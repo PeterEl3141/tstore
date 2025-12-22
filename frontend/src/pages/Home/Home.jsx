@@ -4,6 +4,7 @@ import { fetchTShirts } from "../../api/tshirts";
 import TShirtCard from "../../components/TShirtCard/TShirtCard.jsx";
 import { prioritizeImages } from "../../lib/images";
 import "./Home.css";
+import Loader from "../../components/Loader/Loader.jsx";
 
 // Helper: robustly read category
 function getCategory(t) {
@@ -107,7 +108,7 @@ export default function Home() {
     });
   }, [ordered]);
 
-  if (loading) return <p className="home-loading">Loading…</p>;
+  if (loading) return <Loader label="Loading products" />;
 
   return (
     <section className="home">

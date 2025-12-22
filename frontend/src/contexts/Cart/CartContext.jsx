@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
 
 const CartContext = createContext(null);
-const STORAGE_KEY = "cart:v1";
+const STORAGE_KEY = "cart:v2";
 
 const initialState = { items: [] }; // each: {id, slug, name, priceCents, currency, image, size, color, qty}
 
@@ -13,7 +13,7 @@ function reducer(state, action) {
       const idx = state.items.findIndex((i) => key(i) === key(item));
       if (idx >= 0) {
         const items = state.items.slice();
-        items[idx] = { ...items[idx], qty: items[idx].qty + item.qty };
+        items[idx] = { ...items[idx], ...item, qty: items[idx].qty + item.qty };
         return { items };
       }
       return { items: [...state.items, item] };
